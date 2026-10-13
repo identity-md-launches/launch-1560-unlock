@@ -1,5 +1,9 @@
 # Launch 1534 admission size fix — 2026-10-13
 
+> **Revision 2026-10-13.** The independent review of this restored tree reopened it; `UnlkHook` and `UnlkSwapRouter`
+> bytecode changed afterwards (the helper and the other three artifacts did not). The artifact table below is the
+> size-fix job's historical record; current sizes and hashes are in `ARTIFACTS.json` and `REVISION_2026-10-13.md`.
+
 This is a source-only continuation of job `672489ef-8304-403f-855c-b9dce583bc31`, for parked Sepolia launch
 `55d5370e-7256-465c-808f-09ba4cc8ccee` (1534). It starts from published commit
 `f77cf377f6eb58f05ef9b9c61f36407933d5053a` in

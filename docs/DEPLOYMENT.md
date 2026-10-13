@@ -75,7 +75,12 @@ only encode/predict. The caller supplies the reviewed `UnlkHook` creation body; 
 that input nor deploys anything. The supplied manifest retains the same four supported placeholders.
 
 Factory `launch` creates the token/hook/native distributor, splits the supply, initializes the official native ETH
-pool with this hook, and seeds its token-only position in one transaction. No hook is attached later. Record:
+pool with this hook, and seeds its token-only position in one transaction. No hook is attached later. Since
+revision 2026-10-13 the hook's `beforeInitialize` verifies, on chain 11155111, that the factory, the pool manager,
+`factory.fees()` and `factory.registry()` carry the `SepoliaRelease` code hashes (the same check stage 2 makes);
+if any of them has changed since the pins were recorded, the launch transaction reverts with `InvalidConfig`
+rather than creating a pool that can never activate. Reconfirm the four code hashes against the pins immediately
+before broadcast; a changed service requires a reviewed pin update and a new build, never a bypass. Record:
 
 * Real transaction hash/block and `Launched`/registry records.
 * Token, hook, distributor, actual remainder recipient, seed range/liquidity and opening price.

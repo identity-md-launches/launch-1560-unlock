@@ -180,7 +180,10 @@ contract UnlkHook is IHooks {
     // ------------------------------------------------------------------ stage 1
 
     /// @dev Only the factory may open the pool, only once, only on the official key: native ETH as currency0,
-    /// this token as currency1, fee 12500, spacing 60, this hook. Reads no other contract, so it works before any companion exists.
+    /// this token as currency1, fee 12500, spacing 60, this hook. Reads no companion, so it works before any
+    /// exists. On Sepolia it also runs the same service pin check stage 2 runs (`_verifyServices`): a launch
+    /// whose factory, manager, fees or registry stage 2 would refuse reverts here, in the launch transaction,
+    /// instead of seeding a pool that can never activate.
     function beforeInitialize(address sender, PoolKey calldata key, uint160)
         external
         onlyManager
@@ -193,6 +196,7 @@ contract UnlkHook is IHooks {
             bound || address(key.hooks) != address(this) || key.fee != FEE || key.tickSpacing != TICK_SPACING
                 || c0 != address(0) || c1 != address(token)
         ) revert InvalidPool();
+        _verifyServices();
         // Native ETH (currency0 == address(0)) always sorts first; the brief fixes an ETH pair.
         quoteToken = c0;
         bound = true;
@@ -260,12 +264,16 @@ contract UnlkHook is IHooks {
         if (at == address(0)) revert InvalidConfig();
     }
 
+    /// @dev The Sepolia service pins, checked at stage 1 (`beforeInitialize`) and at both stage-2 calls. The
+    /// factory is checked first, so its `fees()` and `registry()` getters are only read from the pinned code.
     function _verifyServices() private view {
+        if (block.chainid != SEPOLIA_CHAIN_ID) return;
+        ILaunchFactoryView factory = ILaunchFactoryView(launchFactory);
         if (
-            block.chainid == SEPOLIA_CHAIN_ID
-                && (launchFactory.codehash != SepoliaRelease.FACTORY
-                    || address(poolManager).codehash != SepoliaRelease.MANAGER
-                    || ILaunchFactoryView(launchFactory).fees().codehash != SepoliaRelease.FEES)
+            launchFactory.codehash != SepoliaRelease.FACTORY
+                || address(poolManager).codehash != SepoliaRelease.MANAGER
+                || factory.fees().codehash != SepoliaRelease.FEES
+                || address(factory.registry()).codehash != SepoliaRelease.REGISTRY
         ) revert InvalidConfig();
     }
 
@@ -400,10 +408,8 @@ contract UnlkHook is IHooks {
                 || address(ILaunchFactoryView(launchFactory).poolManager()) != address(poolManager)
         ) revert InvalidEvidence();
         ILaunchRegistryView registry = ILaunchFactoryView(launchFactory).registry();
+        // The registry's Sepolia pin is part of `_verifyServices`, which `_verifyLaunch` ran first.
         if (!registry.isRecorded(launchNumber_) || registry.writer() != launchFactory) {
-            revert InvalidEvidence();
-        }
-        if (block.chainid == SEPOLIA_CHAIN_ID && address(registry).codehash != SepoliaRelease.REGISTRY) {
             revert InvalidEvidence();
         }
         ILaunchRegistryView.Artifact[] memory artifacts = registry.artifactsOf(launchNumber_);

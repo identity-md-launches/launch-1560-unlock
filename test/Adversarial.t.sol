@@ -27,9 +27,7 @@ contract AdversarialTest is SystemFixture {
 
     function testQuotaMultiplicationDoesNotOverflowAtMaxEligible() public {
         // Artificial boundary fixture, not a claim that uint256.max acquisitions are economically reachable.
-        stdstore.target(address(hook))
-            .sig(hook.eligible.selector)
-            .with_key(alice)
+        stdstore.target(address(hook)).sig(hook.eligible.selector).with_key(alice)
             .checked_write(type(uint256).max);
         assertEq(hook.remainingQuota(alice), type(uint256).max / 4);
     }

@@ -23,6 +23,9 @@ contract CreditsAndFeesTest is SystemFixture, IUnlockCallback {
     }
 
     function testNativeClaimThenAttestThenSyncThenSale() public {
+        // The sale needs an ETH reserve inside the seed range: the router stops at the seed boundary, and the
+        // local-only depth above it is not reachable, exactly as on Sepolia where it does not exist.
+        _localWarmUpBuy(0.1 ether);
         _advance(1 hours);
         bytes32[] memory proof = new bytes32[](0);
         vm.prank(bob);
@@ -87,6 +90,7 @@ contract CreditsAndFeesTest is SystemFixture, IUnlockCallback {
     }
 
     function testNativeClaimNeverDependsOnAdapterOrFeed() public {
+        _localWarmUpBuy(0.1 ether);
         _advance(1 hours);
         feed.setBroken(true);
         // The adapter is a reader; the distributor's claim path does not know it exists.

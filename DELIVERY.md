@@ -1,5 +1,30 @@
 # UNLOCK / UNLK — new Sepolia launch handoff
 
+## Revision 2026-10-13 — independent review findings
+
+The restored tree below was accepted by the verifier and then reopened by an independent reviewer. Both findings
+reproduced and are fixed; the answers are in `.imd-responses.json` and the full record, with hashes and evidence,
+in [docs/REVISION_2026-10-13.md](docs/REVISION_2026-10-13.md). **`UnlkHook` and `UnlkSwapRouter` bytecode now
+differ from commit `f0149886`**; the token, claim evidence, oracle and helper are byte-for-byte unchanged, and
+`launch.json`, `foundry.toml`, `remappings.txt` and all dependencies are untouched.
+
+* Stage 1 (`beforeInitialize`) now runs the same Sepolia service pin check as stage 2, so a launch through an
+  unpinned factory, manager, fees or registry reverts in the launch transaction instead of locking the seed in a
+  pool that can never activate. Hook runtime 24,359 bytes (217 bytes of margin), creation body
+  `0x1e5ea98995bd91262452ad1a8512eae97e9a02a05920b89f839d440a05f8dd2d`.
+* The router bounds every swap's price limit to the seed range, so a reserve-draining sell ends at the seed's
+  upper boundary (the launch state, liquid) instead of tick 887271. Router runtime 8,831 bytes;
+  `ReviewedCode.ROUTER` is `0x68dfbfa49b0d0140c963870ece6b83a375b00eaeddd64259ad1759ceb3a153c1`.
+* Fresh results: 208 delivered Foundry tests pass (209 with the reviewer's proof copied under `test/scratch/`),
+  the unmodified protected suite passes (11), the Python release gate passes (5), `forge fmt --check` passes, and
+  both stages pass on a recorded Sepolia fork through the real factory at block **11,906,030**
+  (`delivery/checks/revision-*.txt`). `delivery/verify.py`'s source comparison now reports the revised files, by
+  design; [delivery/STATUS.json](delivery/STATUS.json) lists them under `revision.changedFiles`.
+* Nothing was broadcast. Independent re-review of the revised build is a release gate. No economic, oracle or
+  policy rule changed, and the disclosed release risks stand.
+
+The sections below are the record of the restored commit as delivered before this revision.
+
 **The fixed published project is restored and verified. No public launch transaction was sent; trading is not active.** This delivery belongs to new job `407c3cbb-d967-4666-99e6-0ab7139c141f`, not a continuation or retry of launch 1534. It contains the completed source/package and the exact remaining release failures. [Machine-readable current status](delivery/STATUS.json).
 
 All **498 files** from [published commit `f0149886ac3c09b57a0e1d676582e6aeaeb7a69f`](https://github.com/identity-md-launches/launch-1534-unlock/commit/f0149886ac3c09b57a0e1d676582e6aeaeb7a69f) are byte-for-byte intact, including the four-argument hook constructor, small helper, fixed encoder, manifest, compiler settings, dependencies and tests. They reconstruct Git tree `0710257dd00656d130b4c56b7a669734955bb1ef`. Workspace Git metadata and protected inputs were not modified. Dependencies are ordinary files, not submodules. No old bundle or pre-fix source was imported.

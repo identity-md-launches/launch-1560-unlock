@@ -193,9 +193,7 @@ contract MultiLeafEvidenceTest is SystemFixture {
         distributor.claim(0, alice, amounts[0], _proof(0));
         rewards.attest(0, alice, amounts[0], _proof(0));
         assertEq(hook.syncRewards(alice), amounts[0]);
-        stdstore.target(address(rewards))
-            .sig(rewards.claimed.selector)
-            .with_key(alice)
+        stdstore.target(address(rewards)).sig(rewards.claimed.selector).with_key(alice)
             .checked_write(uint256(0));
         vm.expectRevert(UnlkHook.InvalidEvidence.selector);
         hook.pendingRewardCredit(alice);

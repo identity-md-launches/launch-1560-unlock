@@ -44,6 +44,10 @@
     "creation": 756,
     "runtime": 728
   },
-  "productionBytecodeUnchanged": true,
-  "evidence": "docs/SIZE_FIX.md"
+  "productionBytecodeUnchanged": false,
+  "evidence": "docs/SIZE_FIX.md",
+  "revision_2026_10_13": {
+    "note": "UnlkHook and UnlkSwapRouter bytecode changed after independent review; see docs/REVISION_2026-10-13.md and delivery/STATUS.json. This file is otherwise the historical record of the size-fix job.",
+    "hookDeployerBytesUnchanged": true
+  }
 }

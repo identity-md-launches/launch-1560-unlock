@@ -7,6 +7,7 @@ import {IUnlockCallback} from "v4-core/src/interfaces/callback/IUnlockCallback.s
 import {PoolKey} from "v4-core/src/types/PoolKey.sol";
 import {Currency} from "v4-core/src/types/Currency.sol";
 import {BalanceDelta} from "v4-core/src/types/BalanceDelta.sol";
+import {TickMath} from "v4-core/src/libraries/TickMath.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -131,7 +132,7 @@ contract UnlkSwapRouter is IUnlockCallback, ReentrancyGuard {
             }
         }
         SwapParams memory params =
-            SwapParams(request.zeroForOne, request.amountSpecified, request.sqrtPriceLimitX96);
+            SwapParams(request.zeroForOne, request.amountSpecified, _boundedLimit(request));
         uint256 operationNonce = ++nonce;
         activeTrader = msg.sender;
         activeOperation = OperationHash.hash(key, params, msg.sender, operationNonce);
@@ -163,6 +164,22 @@ contract UnlkSwapRouter is IUnlockCallback, ReentrancyGuard {
             else state.inputToken.safeTransfer(msg.sender, request.maxInput - input);
         }
         emit Executed(msg.sender, operationNonce, input, output);
+    }
+
+    /// @dev The official pool's only liquidity is the factory's locked seed range. Past either of its boundaries
+    /// v4 would walk the price through empty liquidity to the caller's limit without trading anything, leaving a
+    /// price outside the range that the oracle classes illiquid for a full window. A sell that consumes the
+    /// pool's whole ETH reserve therefore stops exactly at the seed's upper boundary, the launch state; a buy
+    /// stops at its lower boundary. Partial fills, quota and settlement are unchanged.
+    function _boundedLimit(SwapRequest calldata request) private view returns (uint160 limit) {
+        limit = request.sqrtPriceLimitX96;
+        if (request.zeroForOne) {
+            uint160 floor_ = TickMath.getSqrtPriceAtTick(hook.seedTickLower());
+            if (limit < floor_) limit = floor_;
+        } else {
+            uint160 ceiling = TickMath.getSqrtPriceAtTick(hook.seedTickUpper());
+            if (limit > ceiling) limit = ceiling;
+        }
     }
 
     receive() external payable {

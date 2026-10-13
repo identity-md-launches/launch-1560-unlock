@@ -8,9 +8,11 @@ import {UnlkHook} from "../src/UnlkHook.sol";
 import {UnlkToken} from "../src/UnlkToken.sol";
 
 contract HookDeployerTest is Test {
-    // Published f77cf377: pin the reviewed hook body, independently of the helper's encoding.
+    // Pin the reviewed hook body, independently of the helper's encoding. Revised 2026-10-13: stage-1 pin check
+    // in `beforeInitialize` and the router's seed-boundary price limit (which changes `ReviewedCode.ROUTER`,
+    // a constant the hook embeds). The published f77cf377/f0149886 body hashed to 0xf872...b336.
     bytes32 internal constant REVIEWED_HOOK_CREATION_HASH =
-        0xf872174773f0458defad7ad18888ab294bd88edb611e7fc793eaa833896bb336;
+        0x1e5ea98995bd91262452ad1a8512eae97e9a02a05920b89f839d440a05f8dd2d;
 
     HookDeployer internal helper;
     HookDeployer.Config internal config;

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-10-13T11:39:23.343826+00:00",
+  "recordedAt": "2026-10-13T12:25:15.441780+00:00",
   "jobId": "407c3cbb-d967-4666-99e6-0ab7139c141f",
   "assignmentId": "7e36b690-beb0-4f2d-995a-8e47ecc7bdf0",
   "scope": {
@@ -13,17 +13,19 @@
     "tokenSymbol": "UNLK",
     "continuationOf1534": false
   },
-  "status": "fixed_source_restored_verified_release_gates_pending",
+  "status": "revised_after_independent_review_release_gates_pending",
   "source": {
     "repository": "https://github.com/identity-md-launches/launch-1534-unlock",
     "commit": "f0149886ac3c09b57a0e1d676582e6aeaeb7a69f",
     "tree": "0710257dd00656d130b4c56b7a669734955bb1ef",
-    "exactOriginalFiles": 498,
-    "productionCodeChanged": false,
+    "exactOriginalFiles": "498 restored; see revision.changedFiles for the files this revision changed",
+    "productionCodeChanged": true,
     "manifestChanged": false,
     "supplementalFiles": [
       "DELIVERY.md",
-      "delivery/"
+      "delivery/",
+      "docs/REVISION_2026-10-13.md",
+      ".imd-responses.json"
     ]
   },
   "ownerFromCurrentJob": "0x48e4e74fe1d0c14404ceb57b9fec5b21329c6ec9",
@@ -51,9 +53,10 @@
     "compiler": "0.8.26+commit.8a97fa7a",
     "forgeBuild": "passed",
     "forgeTests": {
-      "passed": 175,
+      "passed": 208,
       "failed": 0,
-      "skipped": 0
+      "skipped": 0,
+      "note": "209 with the reviewer's proof copy in test/scratch, which is deleted before submission"
     },
     "releaseGateTests": {
       "passed": 5,
@@ -66,6 +69,7 @@
       "modified": false
     },
     "minimalEnvironmentTests": {
+      "note": "not rerun in this revision; see the earlier record",
       "passed": 175,
       "threads": 4,
       "fuzzSeed": "0xf0149886",
@@ -75,31 +79,38 @@
       ]
     },
     "forgeFmtCheck": "passed",
-    "localImdLaunchCheck": "passed",
+    "localImdLaunchCheck": "not_rerun_in_this_revision",
     "serviceAdmission": "not_run",
-    "sourceTreeAndPublishedArtifactMatch": "passed",
+    "sourceTreeAndPublishedArtifactMatch": "changed_by_design_see_revision",
     "allSixRuntimeAndFullInitcodeSizes": "passed",
     "slither": "not_run_by_contributor_reserved_for_platform_verifier",
     "mythril": "not_run",
-    "formalVerification": "not_run"
+    "formalVerification": "not_run",
+    "foundryVersion": "1.7.1 (4072e48)"
   },
   "rehearsal": {
     "type": "recorded_block_fork_only",
     "chainId": 11155111,
-    "blockNumber": 11905741,
-    "blockHash": "0xcc877e036fb2058b121c8f86b5524536f60bca8ef5de5644520358962644091c",
-    "path": "delivery/rehearsal/RecordedSepolia.t.sol",
+    "blockNumber": 11906030,
+    "blockHash": "0x6f28f1fbf63d2f156df99f6aa68b5cda5b4af8bec7d5a488b6057dddf7b98a40",
+    "publicEndpoint": "https://ethereum-sepolia-rpc.publicnode.com",
+    "path": "delivery/rehearsal/RecordedSepolia.t.sol (block number substituted in a scratch copy)",
     "passed": 1,
     "failed": 0,
     "broadcast": false,
     "usesImpersonation": true,
     "usesLocalTimeTravel": true,
     "allocationTree": "Synthetic local one-recipient complete 100M allocation; never public release data.",
-    "evidence": "delivery/checks/extended-fork.txt",
-    "publicDeploymentProof": false
+    "evidence": "delivery/checks/revision-fork.txt",
+    "publicDeploymentProof": false,
+    "previous": {
+      "blockNumber": 11905741,
+      "evidence": "delivery/checks/extended-fork.txt",
+      "note": "ran on the unrevised hook"
+    }
   },
   "independentReview": {
-    "status": "pending_platform_panel",
+    "status": "findings_answered_rereview_pending",
     "nodes": [
       "audit_economics",
       "audit_flow",
@@ -108,7 +119,11 @@
       "audit_permissions"
     ],
     "evidence": "delivery/network/current-job.json",
-    "selfChecksAreIndependent": false
+    "selfChecksAreIndependent": false,
+    "findingsAnswered": [
+      "d2d6b0dbd9b5816d732305701acf5da83273e5bc2cdc9059de108e93f4cc7a92",
+      "9224491be22452440adb95622ab85482e1213450dffde4e5cf249d8398f3d7ec"
+    ]
   },
   "serviceImport": {
     "sourceResolution": "passed_at_required_sha",
@@ -131,7 +146,7 @@
     "privateKeyRequestedOrRead": false
   },
   "blockers": [
-    "Independent economics/flow/math/permissions/judge review of the current submission is pending; known release risks remain unresolved.",
+    "Independent re-review of this revised build (hook and router bytecode changed) is pending; known release risks remain unresolved.",
     "Supported import resolves the exact source; launch input preflight returns bad_path_count for impl and tests, including with explicit paths. Platform must resolve without changing univ4_hook.",
     "The current new launch has no allocated id/number, service attestation, frozen round-0 tree or actual stage-1 receipt yet.",
     "No verified authorized owner-signing service/wallet execution and certificate submitter are available for stage 2. Do not send stage 1 first."
@@ -147,5 +162,52 @@
   "riskAcceptanceOrEconomicChangesMade": false,
   "productionSafetyClaimed": false,
   "documentation": "DELIVERY.md",
-  "operations": "delivery/OPERATIONS.md"
+  "operations": "delivery/OPERATIONS.md",
+  "revision": {
+    "date": "2026-10-13",
+    "reason": "Independent review findings d2d6b0db (medium: stage 1 accepted services stage 2 refuses) and 9224491b (low: reserve-draining sell walked the price to tick 887271)",
+    "record": "docs/REVISION_2026-10-13.md",
+    "responses": ".imd-responses.json",
+    "changedFiles": [
+      "src/UnlkHook.sol",
+      "src/UnlkSwapRouter.sol",
+      "src/interfaces/IIntegration.sol",
+      "src/libraries/ReviewedCode.sol",
+      "test/HookDeployer.t.sol",
+      "test/CreditsAndFees.t.sol",
+      "test/Adversarial.t.sol",
+      "test/EvidenceAndOracleProperties.t.sol",
+      "test/FailurePaths.t.sol",
+      "docs/ARTIFACTS.json",
+      "docs/SOURCE_SHA256SUMS",
+      "docs/abi/"
+    ],
+    "addedFiles": [
+      "test/SepoliaPins.t.sol",
+      "test/SeedBoundary.t.sol",
+      "test/fixtures/SepoliaRuntime.sol",
+      "docs/REVISION_2026-10-13.md",
+      "delivery/checks/revision-test.txt",
+      "delivery/checks/revision-protected.txt",
+      "delivery/checks/revision-fmt.txt",
+      "delivery/checks/revision-fork.txt",
+      ".imd-responses.json"
+    ],
+    "productionBytecodeChanged": [
+      "UnlkHook",
+      "UnlkSwapRouter"
+    ],
+    "productionBytecodeUnchanged": [
+      "UnlkToken",
+      "MerkleClaimEvidence",
+      "UnlkOracle",
+      "HookDeployer"
+    ],
+    "hookCreationBodyKeccak256": "0x1e5ea98995bd91262452ad1a8512eae97e9a02a05920b89f839d440a05f8dd2d",
+    "reviewedRouterCreationKeccak256": "0x68dfbfa49b0d0140c963870ece6b83a375b00eaeddd64259ad1759ceb3a153c1",
+    "hookRuntimeBytes": 24359,
+    "routerRuntimeBytes": 8831,
+    "manifestChanged": false,
+    "economicOrOracleRulesChanged": false
+  }
 }

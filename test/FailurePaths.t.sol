@@ -315,9 +315,7 @@ contract RouterAndHookFailurePathsTest is SystemFixture {
     function testFuzzRemainingQuotaFormula(uint128 eligible, uint128 sold, uint8 tierSeed) public {
         uint16[7] memory percentages = [uint16(2500), 3500, 4500, 5500, 7000, 8500, 10000];
         uint16 p = percentages[tierSeed % 6];
-        stdstore.target(address(hook))
-            .sig(hook.eligible.selector)
-            .with_key(bob)
+        stdstore.target(address(hook)).sig(hook.eligible.selector).with_key(bob)
             .checked_write(uint256(eligible));
         stdstore.target(address(hook)).sig(hook.sold.selector).with_key(bob).checked_write(uint256(sold));
         stdstore.target(address(hook)).sig(hook.p.selector).enable_packed_slots().checked_write(p);

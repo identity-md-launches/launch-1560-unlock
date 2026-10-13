@@ -1,5 +1,15 @@
 # UNLOCK / UNLK — Sepolia two-stage release package
 
+**Revision 2026-10-13 (independent review findings):** `beforeInitialize` now runs the same Sepolia service pin
+check as stage 2, so a launch through an unpinned factory, manager, fees or registry reverts in the launch
+transaction instead of locking the seed in a pool that can never activate; and the router bounds every swap's
+price limit to the factory's seed range, so a sell that drains the ETH reserve ends at the seed boundary (the
+launch state) instead of walking the price into empty liquidity that the oracle classed illiquid. `UnlkHook` and
+`UnlkSwapRouter` bytecode changed; the other four artifacts did not. Details, hashes and evidence:
+[docs/REVISION_2026-10-13.md](docs/REVISION_2026-10-13.md); current status: [delivery/STATUS.json](delivery/STATUS.json).
+The paragraphs below are the historical record of the restored published commit and still apply unless that
+revision record says otherwise. The delivered suite is now 208 tests in 40 suites.
+
 **This continuation fixes the source of launch 1534's admission failure; public trading remains inactive.**
 Launch `55d5370e-7256-465c-808f-09ba4cc8ccee` is parked because the old `HookDeployer` runtime was 26,264 bytes.
 The helper now accepts the reviewed hook creation code as input and has a **728-byte runtime**. All five production
@@ -41,9 +51,11 @@ checks. [Validation evidence](docs/VALIDATION.md) distinguishes unit/invariant t
 * `UnlkHook`: constructor **`($poolManager, $token, $factory, $owner)`**, no companion arguments or constructor
   external calls. `$owner` is an immutable setup authority, never the factory or IMD signer.
 * Stage 1: factory creates token/hook/distributor and initializes the native ETH pool with this hook already in
-  its `PoolKey`. Only the manager can call callbacks; only the factory can initialize, exactly once. Factory
-  seeding works while UNCONFIGURED. Swaps, quota credits and milestones revert; ordinary transfers and eligible
-  native distributor claims work independently.
+  its `PoolKey`. Only the manager can call callbacks; only the factory can initialize, exactly once. On chain
+  11155111 `beforeInitialize` also requires the factory, pool manager, the factory's `fees()` and its
+  `registry()` to carry the pinned `SepoliaRelease` code hashes, the same check both stage-2 calls make, so a
+  launch stage 2 would refuse cannot be created. Factory seeding works while UNCONFIGURED. Swaps, quota credits
+  and milestones revert; ordinary transfers and eligible native distributor claims work independently.
 * Stage 2a: the setup authority calls `deployCompanions(number,feed,routerCode,evidenceCode,oracleCode)` on the
   hook. Each supplied **creation bytecode** must match its compiled constant hash. The hook derives constructor
   arguments from its stage-1 records and deploys all three companions by CREATE2 in one atomic call. This also
@@ -60,6 +72,8 @@ checks. [Validation evidence](docs/VALIDATION.md) distinguishes unit/invariant t
 * `UnlkSwapRouter`: the sole official-pool swap route. It pulls only `msg.sender`'s input and delivers only to that
   caller. Per-operation context/nonce authenticate the trader; no `tx.origin`. Native outputs and unused ETH
   become caller-owned pull credits (`withdrawNative`). No arbitrary recipient, arbitrary payer or admin sweep.
+  Every swap's price limit is bounded to the factory's seed range (the pool's only liquidity): a sell stops at
+  the seed's upper boundary and a buy at its lower boundary, with partial fills; a tighter caller limit applies.
 * `MerkleClaimEvidence`: actual distributor claim flag **and** exact leaf proof, once per round/recipient. A full
   tree certificate proves recipient uniqueness before amounts can be attested, including claims made before
   activation. Native claims need no certificate, oracle, hook call or credit synchronization.

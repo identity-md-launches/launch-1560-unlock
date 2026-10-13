@@ -1,5 +1,9 @@
 # Validation record — 2026-10-13
 
+> **Revision 2026-10-13.** The results below are the size-fix job's record. The revised build's results (208 delivered
+> tests, protected suite, release gate, format check, recorded-block fork at 11906030) are in `REVISION_2026-10-13.md`
+> and `../delivery/checks/revision-*.txt`. Foundry on the revising machine was 1.7.1.
+
 These are implementation-author results, not an independent audit or deployment attestation. **No public
 transaction was broadcast.** Release status and outstanding wallet operations are in `../RELEASE_STATUS.json`
 and `DEPLOYMENT.md`.

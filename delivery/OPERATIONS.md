@@ -1,6 +1,6 @@
 # Reproduction and operations for the new launch
 
-The source is the exact published fixed commit. Do not apply the historical instruction to retry launch 1534. No command below establishes wallet control or waives independent review. Release is gated as recorded in [../DELIVERY.md](../DELIVERY.md).
+The source was the exact published fixed commit; revision 2026-10-13 then changed `UnlkHook` and `UnlkSwapRouter` (see [../docs/REVISION_2026-10-13.md](../docs/REVISION_2026-10-13.md)), so `delivery/verify.py`'s published-source comparison now reports those files and the regenerated records as changed, by design. Use the exported artifact records in `docs/ARTIFACTS.json` and the reviewed creation hashes in `src/libraries/ReviewedCode.sol` from the current build. Do not apply the historical instruction to retry launch 1534. No command below establishes wallet control or waives independent review. Release is gated as recorded in [../DELIVERY.md](../DELIVERY.md).
 
 ## Offline reproduction
 

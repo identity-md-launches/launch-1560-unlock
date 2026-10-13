@@ -44,6 +44,8 @@ interface IUnlkHookView {
     function poolManager() external view returns (IPoolManager);
     function router() external view returns (address);
     function launchFactory() external view returns (address);
+    function seedTickLower() external view returns (int24);
+    function seedTickUpper() external view returns (int24);
 }
 
 interface IUnlkRouterView {
