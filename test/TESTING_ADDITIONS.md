@@ -95,6 +95,36 @@ and EVM size limits match. The hook remains **24,328 runtime / 25,830 full initc
 bytes**; the helper remains **728 runtime / 756 initcode bytes**. All original source
 digests and the four companion/token `ReviewedCode` hashes pass unchanged.
 
+## Revision against the 2026-10-13 implementation revision
+
+The implementation changed under these tests after they were accepted: the other contributor's
+revision (commit `f5bb0d3`) made `beforeInitialize` run the Sepolia service pins at stage 1 and made
+`UnlkSwapRouter` clamp every swap's price limit to the factory's seed range read from the hook.
+`TokenLedgerProperties.t.sol` and `FeeCustodyProperties.t.sol` are unchanged and still pass on the
+revised code (the fee-custody campaign's sales never left the seed range, so the clamp changes nothing
+they observe).
+
+`SeedRangeLimitProperties.t.sol` adds adversarial properties for exactly the changed router mechanism,
+on the Sepolia-faithful token-only seed with **no** local quote depth, so the seed range is the pool's
+only liquidity as on the public chain:
+
+| Test | Guarantee checked |
+| --- | --- |
+| `testLaunchStateSellRevertsAsPriceLimitAlreadyExceeded` | In the launch state the clamp turns the client's open limit into the boundary itself; v4 refuses it with the exact `PriceLimitAlreadyExceeded(ceiling, ceiling)`; nonce, `sold`, balance and approval are untouched, and the same request works once a reserve exists. |
+| `testExactOutputSellBeyondTheReserveRevertsSlippageWithoutState` | An exact-output sale past the reserve stops on the boundary and is refused as `Slippage` with no observation, balance or counter change; a fillable exact output then succeeds. |
+| `testBuyLimitBelowTheFloorIsClampedAndLimitAboveThePriceIsRefused` | A buy at v4's open limit and at the seed floor execute identically (state snapshot); a buy whose limit is at the price is refused with no refund credit. |
+| `testFuzzSellLimitIsClampedExactlyToTheSeedCeiling` (512 runs) | For caller limits drawn below the price, between the price and the ceiling, and above the ceiling: the executed result (success or exact revert data, input, output, end price, `sold`, `eligible`, nonce) equals executing the hand-clamped limit; a tighter caller limit is honoured and a partial fill ends exactly on it; a zero-output dust fill is the only tolerated refusal above the price. |
+| `testFuzzDrainAndRebuyKeepsTheOracleReadable` (256 runs) | A quota-sized sale into a reserve of up to 0.1 ETH drains it to the ceiling with a partial fill, manager ETH equals executed flow, trading resumes at once, and a window later the FDV is priced with every observation liquid. |
+| `SeedRangeInvariantTest` (128 runs x 48 calls, `fail-on-revert`) | Random exact-input buys, exact-input and exact-output sales with limits from the whole v4 range (open, at-price and uniform), time advances with checkpoints, payer synchronisation and withdrawals by three wallets. Invariants: the price and tick never leave the seed range; every oracle observation is liquid with zero bad seconds; the factory's seed liquidity never changes and the manager's ETH and UNLK equal executed flows; `sold` equals the ghost of executed sales, never exceeds `floor(E*p/10000)`, and `remainingQuota` matches the formula. The handler tolerates only four exact refusals (`PriceLimitAlreadyExceeded` when the effective limit cannot move the price, `Slippage` on exact output, `InvalidSwap` on a zero-output dust sale, and the hook's wrapped `QuotaExceeded` on an exact output past the quota), checks the price is unchanged after each, and re-raises anything else. `testHandlerBranchesAreReachable` drives every branch. |
+
+Results on Foundry 1.8.5 / solc 0.8.26: the combined suite passes **205 tests across 45 suites**,
+zero failures or skips (`test/results/foundry-tests.txt`, `test/results/build.txt` refreshed). The new
+campaign completed 6,144 handler calls with zero unexpected reverts. No implementation defect was
+reproduced by these additions, so no `.imd-findings.json` is written. Two harness-only mistakes were
+found and fixed in the new tests during development (an invariant's own subtraction order, and a
+handler that demanded a full fill for a buy whose fuzzed limit lay inside the range); neither concerns
+the implementation.
+
 ## Limits
 
 These are local reproducible checks, not independent audit or production-safety claims.
