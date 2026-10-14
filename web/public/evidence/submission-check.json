@@ -1,0 +1,20 @@
+{
+  "scope": "Complete Git candidate regular-file contents, including pre-existing contracts/dependencies and new source/export; excluding ignored inputs/scratch/cache and Git metadata.",
+  "regularFiles": 680,
+  "regularFileBytes": 7425153,
+  "limitBytes": 8388608,
+  "withinLimit": true,
+  "distBytes": 1355054,
+  "checks": {
+    "protectedTrackedFilesUnchanged": true,
+    "onlyExistingFileChanged": "README.md",
+    "noSubmodulesOrSymlinks": true,
+    "noGeneratedDependencyDirectoriesOrArchives": true,
+    "allPublicAssetsMatchExport": true,
+    "relativeEntryAssetsExist": true,
+    "shareMetadataPresent": true,
+    "manifestAndLockAgree": true,
+    "ignoreFilesUnchanged": true
+  },
+  "note": "Source and complete required runtime assets are retained. No Git commit or publication was attempted; the contributor publisher handles submission/publication."
+}

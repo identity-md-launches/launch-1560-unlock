@@ -1,0 +1,152 @@
+{
+  "checkedAt": "2026-10-14T08:45:20.302Z",
+  "block": "11912146",
+  "rate": "2500",
+  "fullyUnlocked": false,
+  "history": {
+    "from": "11906181",
+    "to": "11912144",
+    "complete": true,
+    "eventCount": 11,
+    "kinds": {
+      "Transfer": 7,
+      "Claimed": 1,
+      "Swap": 1,
+      "Credit": 1,
+      "Executed": 1
+    }
+  },
+  "holders": [
+    {
+      "address": "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543",
+      "balance": "869508705008124703363175346",
+      "E": "0",
+      "S": "0",
+      "within": "0",
+      "share": "86.9508%",
+      "label": "PoolManager · shared infrastructure"
+    },
+    {
+      "address": "0xF55d5BAcbf3CE5464921a94708c08A99BEa99cDd",
+      "balance": "99845261121856866537717600",
+      "E": "0",
+      "S": "0",
+      "within": "0",
+      "share": "9.9845%",
+      "label": "Reward distributor"
+    },
+    {
+      "address": "0x48E4E74fE1d0c14404cEB57B9fec5b21329C6ec9",
+      "balance": "30646033870018430099107054",
+      "E": "491294991875296636822153",
+      "S": "0",
+      "within": "122823747968824159205538",
+      "share": "3.0646%",
+      "label": "Original payer"
+    }
+  ],
+  "arithmetic": [
+    {
+      "address": "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543",
+      "W": "869508705008124703363175346",
+      "E": "0",
+      "S": "0",
+      "contractRemainingQuota": "0",
+      "calculated": {
+        "within": "0",
+        "outside": "869508705008124703363175346",
+        "quota": "0",
+        "cap": "0"
+      },
+      "match": true
+    },
+    {
+      "address": "0xF55d5BAcbf3CE5464921a94708c08A99BEa99cDd",
+      "W": "99845261121856866537717600",
+      "E": "0",
+      "S": "0",
+      "contractRemainingQuota": "0",
+      "calculated": {
+        "within": "0",
+        "outside": "99845261121856866537717600",
+        "quota": "0",
+        "cap": "0"
+      },
+      "match": true
+    },
+    {
+      "address": "0x48E4E74fE1d0c14404cEB57B9fec5b21329C6ec9",
+      "W": "30646033870018430099107054",
+      "E": "491294991875296636822153",
+      "S": "0",
+      "contractRemainingQuota": "122823747968824159205538",
+      "calculated": {
+        "within": "122823747968824159205538",
+        "outside": "30523210122049605939901516",
+        "quota": "122823747968824159205538",
+        "cap": "122823747968824159205538"
+      },
+      "match": true
+    }
+  ],
+  "proofs": {
+    "count": 459,
+    "allValid": true,
+    "completeRoot": "0x5f3ad28ab5edf227bcf55858bc26fdf3711ba3d3a44fca171ddeb0b6c994c53b",
+    "nativeRoot": "0x5f3ad28ab5edf227bcf55858bc26fdf3711ba3d3a44fca171ddeb0b6c994c53b"
+  },
+  "buySimulations": [
+    {
+      "amount": "0.000001",
+      "account": "0x48e4e74fe1d0c14404ceb57b9fec5b21329c6ec9",
+      "result": [
+        "1000000000000",
+        "49101752648163351483"
+      ],
+      "math": {
+        "input": "1000000000000",
+        "output": "49101752648163351483",
+        "fee": "12500000000",
+        "sqrtAfter": "558675358600092851987487366706566",
+        "partial": false
+      },
+      "match": true
+    },
+    {
+      "amount": "0.001",
+      "account": "0x48e4e74fe1d0c14404ceb57b9fec5b21329c6ec9",
+      "result": [
+        "1000000000000000",
+        "49098982767600739369202"
+      ],
+      "math": {
+        "input": "1000000000000000",
+        "output": "49098982767600739369202",
+        "fee": "12500000000000",
+        "sqrtAfter": "558643843146302739006811710097233",
+        "partial": false
+      },
+      "match": true
+    },
+    {
+      "amount": "0.01",
+      "account": "0x48e4e74fe1d0c14404ceb57b9fec5b21329c6ec9",
+      "result": [
+        "10000000000000000",
+        "490740429709240741651062"
+      ],
+      "math": {
+        "input": "10000000000000000",
+        "output": "490740429709240741651062",
+        "fee": "125000000000000",
+        "sqrtAfter": "558360080365947677498639151402987",
+        "partial": false
+      },
+      "match": true
+    }
+  ],
+  "notes": [
+    "Only eth_call and read operations. No transaction was broadcast.",
+    "No state overrides were used for these live simulations."
+  ]
+}

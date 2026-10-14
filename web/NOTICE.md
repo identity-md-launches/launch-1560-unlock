@@ -1,0 +1,7 @@
+# Website notices
+
+- Interface guidance: Jakub Krehel, Better Interface, MIT, commit `267330e1adfc66a718fb65fa6918c1f06d0a689e`, https://github.com/jakubkrehel/skills. Documentation method: Paul Bakaus, Impeccable, Apache-2.0, commit `9d715cc4f5564a990ca8345abfdd5df6dc9b41c8`, https://github.com/pbakaus/impeccable. The pinned combined license is retained in `licenses/design-guidance.txt`. Design choices and implementation are specific to this UNLOCK assignment.
+- DM Sans and Instrument Serif use the SIL Open Font License. Local WOFF2 assets are in `src/assets/fonts/`; the notices in `public/fonts/` are also shipped with the export. DM Sans is from @fontsource-variable/dm-sans 5.2.8; Instrument Serif is the Fontsource Latin normal/italic 400 release fetched on 2026-10-14.
+- MetaMask's fox is from MetaMask/brand-resources. Rabby and Phantom marks are from RainbowKit 2.2.8 (MIT). Coinbase's mark follows the supplied wallet-connector reference. Marks identify third-party wallet providers and do not imply endorsement. Browser-discovered wallet marks come from each EIP-6963 provider.
+- The geometric UNLOCK emblem and share image source are authored for this website; no stock illustration or generated bitmap library is used.
+- React, Vite, TypeScript, viem and Coinbase Wallet SDK retain their respective upstream licenses. Exact dependency versions and resolved package integrity are in `package-lock.json`; no dependency copies or caches are part of this submission.

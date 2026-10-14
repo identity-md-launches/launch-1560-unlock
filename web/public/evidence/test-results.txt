@@ -1,0 +1,33 @@
+Existing-contract and cross-language execution excerpts. These are worker checks, not independent certification.
+
+contract-tests.log
+╰-----------------------+-------------------+-------+---------+----------╯
+
+[PASS] test_ModelExercisesDelayedCertificationSweepsAndRecycledFunding() (gas: 4966220)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 32.98s (32.83s CPU time)
+
+Ran 6 test suites in 33.00s (34.43s CPU time): 49 tests passed, 0 failed, 0 skipped (49 total tests)
+
+native-contract-tests.log
+╰----------------------+--------------+-------+---------+----------╯
+
+[PASS] test_HandlerTradesRejectsReentersAndDrainsWithoutTakingDonations() (gas: 5323166)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 31.75s (31.60s CPU time)
+
+Ran 3 test suites in 31.79s (40.78s CPU time): 15 tests passed, 0 failed, 0 skipped (15 total tests)
+
+swap-math-contract.log
+
+Ran 1 test for test/scratch/FrontendSwapMath.t.sol:FrontendSwapMathTest
+[PASS] test_BigIntFrontendMatchesV4IncludingBothDirectionsAndPartialFills() (gas: 38490)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 3.82ms (3.46ms CPU time)
+
+Ran 1 test suite in 31.86ms (3.82ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
+
+allowance-contract.log
+
+Ran 1 test for test/scratch/FrontendAllowance.t.sol:FrontendAllowanceTest
+[PASS] test_FrontendAllowanceMatchesHookAtEveryTier() (gas: 33617299)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 249.44ms (159.67ms CPU time)
+
+Ran 1 test suite in 265.80ms (249.44ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
