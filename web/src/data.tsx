@@ -126,7 +126,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     <DataContext.Provider
       value={{
         snapshot,
-        wallet,
+        wallet:
+          wallet?.address.toLowerCase() === w.address?.toLowerCase()
+            ? wallet
+            : null,
         index,
         holders,
         error,

@@ -3,9 +3,16 @@ import { type Address } from "viem";
 import { useData } from "./data";
 import { useWallet, errorMessage } from "./wallet";
 import { abi, addresses as a, client, explorer } from "./config";
-import { Amount, Notice, PageHeading, DataStamp } from "./components";
-import { exact, minReceipt, number, parseAmount, swapStep, usd } from "./math";
-import { PriceChart } from "./charts";
+import { Amount, Notice } from "./components";
+import {
+  exact,
+  minReceipt,
+  number,
+  parseAmount,
+  swapStep,
+  shortcutAmount,
+  gasReserve,
+} from "./math";
 interface SwapRequest {
   zeroForOne: boolean;
   amountSpecified: bigint;
@@ -40,6 +47,15 @@ export function Trade() {
   const [error, setError] = useState("");
   const [, tick] = useState(0);
   const generation = useRef(0);
+  const shortcutRun = useRef(0);
+  const [filling, setFilling] = useState(false);
+  const [reserved, setReserved] = useState<bigint | null>(null);
+  useEffect(() => {
+    shortcutRun.current++;
+    setFilling(false);
+    setReserved(null);
+    setAmount("");
+  }, [buy, w.address, w.network]);
   const formRef = useRef({ buy, amount, slippage, address: w.address });
   formRef.current = { buy, amount, slippage, address: w.address };
   useEffect(() => {
@@ -73,7 +89,89 @@ export function Trade() {
     !!s &&
     d.wallet.block === s.block &&
     !d.error &&
+    !d.walletError &&
+    d.wallet.address.toLowerCase() === w.address.toLowerCase() &&
     Date.now() - s.fetchedAt < 60000;
+  const poolBlocker = s
+    ? s.protocolFee !== 0 || s.lpFee !== 12500
+      ? "Pool fees prevent official trading. Refresh to check again."
+      : s.positionLiquidity <= 0n ||
+          (buy ? s.sqrt <= s.lower : s.sqrt >= s.upper)
+        ? "No executable liquidity in this direction at the seed range limit."
+        : ""
+    : "";
+  async function fillPercentage(percent: number) {
+    if (!walletReady || !d.wallet || !s || !w.address) return;
+    const id = ++shortcutRun.current;
+    const wallet = d.wallet;
+    setFilling(true);
+    setError("");
+    try {
+      if (poolBlocker) throw Error(poolBlocker);
+      if (!buy) {
+        if (wallet.within <= 0n)
+          throw Error("No current official-pool sell allowance.");
+        const capacity = swapStep(
+          false,
+          wallet.within,
+          s.sqrt,
+          s.upper,
+          s.positionLiquidity,
+        ).input;
+        const value = shortcutAmount(
+          wallet.within < capacity ? wallet.within : capacity,
+          percent,
+        );
+        if (id === shortcutRun.current) setAmount(exact(value));
+        return;
+      }
+      const price = await client.getGasPrice();
+      const estimate = async (value: bigint) =>
+        client.estimateContractGas({
+          address: a.router,
+          abi: abi.router,
+          functionName: "swap",
+          args: [
+            {
+              zeroForOne: true,
+              amountSpecified: -value,
+              sqrtPriceLimitX96: s.lower,
+              maxInput: value,
+              minOutput: 1n,
+              deadline: s.timestamp + 300n,
+            },
+          ],
+          account: w.address!,
+          value,
+        });
+      // Estimate a small real router trade first, then the actual percentage candidate.
+      const probe = wallet.native / 100n;
+      if (probe <= 0n)
+        throw Error(
+          "Insufficient test ETH to estimate a trade and reserve gas.",
+        );
+      let reserve = gasReserve(await estimate(probe), price);
+      let value = shortcutAmount(wallet.native, percent, reserve);
+      if (value <= 0n)
+        throw Error("The estimated gas reserve uses your available test ETH.");
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const next = gasReserve(await estimate(value), price);
+        if (next <= reserve) break;
+        reserve = next;
+        value = shortcutAmount(wallet.native, percent, reserve);
+        if (value <= 0n)
+          throw Error("Insufficient test ETH after reserving gas.");
+      }
+      if (id === shortcutRun.current) {
+        setAmount(exact(value));
+        setReserved(reserve);
+      }
+    } catch (e) {
+      if (id === shortcutRun.current) setError(errorMessage(e));
+    } finally {
+      if (id === shortcutRun.current) setFilling(false);
+    }
+  }
   function validateInput() {
     if (!s || d.error || Date.now() - s.fetchedAt > 60000)
       throw Error(
@@ -82,6 +180,14 @@ export function Trade() {
     if (!w.address || !d.wallet)
       throw Error("Connect your wallet and wait for its balance to load.");
     if (w.network !== 11155111) throw Error("Switch your wallet to Sepolia.");
+    if (
+      d.wallet.address.toLowerCase() !== w.address.toLowerCase() ||
+      d.wallet.block !== s.block
+    )
+      throw Error(
+        "Wallet values are refreshing. Retry once the latest balance is loaded.",
+      );
+    if (poolBlocker) throw Error(poolBlocker);
     const n = parseAmount(amount);
     if (buy && n >= d.wallet.native)
       throw Error("Leave enough test ETH in your wallet for gas.");
@@ -149,6 +255,10 @@ export function Trade() {
         }),
         client.getGasPrice(),
       ]);
+      if (buy && d.wallet && n + gasReserve(gas, gasPrice) > d.wallet.native)
+        throw Error(
+          "Not enough test ETH for this input plus the estimated gas reserve. Use MAX or reduce the amount.",
+        );
       if (gen !== generation.current) return;
       setQuote({
         request,
@@ -257,283 +367,287 @@ export function Trade() {
     });
   }
   return (
-    <>
-      <PageHeading title="Trade on your terms.">
-        The official ETH / UNLK pool. Every quote is simulated for your wallet.
-      </PageHeading>
-      <div className="trade-layout">
-        <section className="market-panel">
-          <div className="market-title">
-            <h2>
-              UNLK <span className="muted">/ ETH</span>
-            </h2>
-            <span className="tag">Official pool</span>
-          </div>
-          <div className="market-price">
-            <strong>
-              {s?.spotUsd !== null && s?.spotUsd !== undefined
-                ? `$${number(s.spotUsd, 8)}`
-                : "USD unavailable"}
-            </strong>
-            <span className="muted">Indicative spot price per UNLK</span>
-            <p className="small">
-              {s?.spot != null
-                ? `${number(s.spot, 12)} test ETH / UNLK`
-                : "Reading pool price…"}
-            </p>
-          </div>
-          <PriceChart />
-          <div className="market-facts">
-            <div>
-              <span>Verified milestone FDV</span>
-              <strong>{usd(s?.fdv)}</strong>
-            </div>
-            <div>
-              <span>Current pool fee</span>
-              <strong>{s ? `${s.lpFee / 10000}%` : "Reading…"}</strong>
-            </div>
-            <div>
-              <span>Seed-position ETH principal</span>
-              <Amount value={s?.poolEth} unit="test ETH" digits={8} />
-            </div>
-          </div>
-          <p className="small muted">
-            Spot is the current pool price, not a verified milestone. Pool
-            amounts describe this seed position and exclude accrued fees. They
-            are not PoolManager’s aggregate balances.
-          </p>
-        </section>
-        <section className="swap-panel" aria-label="Swap form">
-          <div className="segmented" aria-label="Trade direction">
-            <button aria-pressed={buy} onClick={() => setBuy(true)}>
-              Buy UNLK
-            </button>
-            <button aria-pressed={!buy} onClick={() => setBuy(false)}>
-              Sell UNLK
-            </button>
-          </div>
-          <div className="swap-input">
-            <label htmlFor="trade-amount">You pay</label>
-            <div className="amount-entry">
-              <input
-                id="trade-amount"
-                inputMode="decimal"
-                autoComplete="off"
-                placeholder="0.00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                aria-describedby="trade-error trade-balance"
-                aria-invalid={!!error}
-              />
-              <span>{buy ? "ETH" : "UNLK"}</span>
-            </div>
-            <div id="trade-balance" className="small muted">
-              {d.wallet ? (
-                <>
-                  {buy ? "Wallet balance: " : "Within your allowance: "}
-                  <Amount
-                    value={buy ? d.wallet.native : d.wallet.within}
-                    unit={buy ? "test ETH" : "UNLK"}
-                  />
-                  {!buy && (
-                    <button
-                      className="text-button"
-                      onClick={() => setAmount(exact(d.wallet!.within))}
-                    >
-                      Use allowance
-                    </button>
-                  )}
-                </>
-              ) : (
-                "Connect to see your balance"
-              )}
-            </div>
-          </div>
-          <div className="swap-divider" aria-hidden="true">
-            ↓
-          </div>
-          <div className="receive">
-            <span>You receive{!buy ? " as router credit" : ""}</span>
-            <strong>
+    <section
+      className={`swap-panel panel ${buy ? "buy-mode" : "sell-mode"}`}
+      aria-label="Swap form"
+    >
+      <div className="segmented" aria-label="Trade direction">
+        <button aria-pressed={buy} onClick={() => setBuy(true)}>
+          Buy UNLK
+        </button>
+        <button aria-pressed={!buy} onClick={() => setBuy(false)}>
+          Sell UNLK
+        </button>
+      </div>
+      <div className="swap-input">
+        <label htmlFor="trade-amount">You pay</label>
+        <div className="amount-entry">
+          <input
+            id="trade-amount"
+            inputMode="decimal"
+            autoComplete="off"
+            placeholder="0.00"
+            value={amount}
+            onChange={(e) => {
+              shortcutRun.current++;
+              setFilling(false);
+              setReserved(null);
+              setAmount(e.target.value);
+            }}
+            aria-describedby="trade-error trade-balance"
+            aria-invalid={!!error}
+          />
+          <span>{buy ? "ETH" : "UNLK"}</span>
+        </div>
+        <div id="trade-balance" className="small muted">
+          {d.wallet ? (
+            <>
+              {buy ? "Wallet balance: " : "Within your allowance: "}
               <Amount
-                value={quote?.output}
-                unit={buy ? "UNLK" : "test ETH"}
+                value={buy ? d.wallet.native : d.wallet.within}
+                unit={buy ? "test ETH" : "UNLK"}
+              />
+            </>
+          ) : (
+            "Connect to see your balance"
+          )}
+        </div>
+      </div>
+      <div className="percentage-controls" aria-label="Fill trade amount">
+        {[25, 50, 75, 100].map((percent) => (
+          <button
+            key={percent}
+            disabled={!walletReady || filling || w.busy || !!poolBlocker}
+            onClick={() => void fillPercentage(percent)}
+          >
+            {percent === 100 ? "MAX" : `${percent}%`}
+          </button>
+        ))}
+      </div>
+      <p className="gas-note small muted" role="status">
+        {filling
+          ? "Estimating gas; no signature requested…"
+          : reserved !== null
+            ? `Gas reserved: ${number(reserved, 8)} test ETH (20% buffer).`
+            : buy
+              ? "Buy shortcuts reserve estimated gas."
+              : "Shortcuts use current allowance and pool capacity."}
+      </p>
+      <div className="receive">
+        <span>You receive{!buy ? " as router credit" : ""}</span>
+        <strong>
+          <Amount
+            value={quote?.output}
+            unit={buy ? "UNLK" : "test ETH"}
+            digits={8}
+          />
+        </strong>
+        <span className="small muted">
+          {quote
+            ? stale
+              ? "Quote expired. Refresh before signing."
+              : "Simulated output, fees included"
+            : "Enter an amount for a simulated quote"}
+        </span>
+      </div>
+      <label className="setting" htmlFor="slippage">
+        Slippage tolerance
+        <select
+          id="slippage"
+          value={slippage}
+          onChange={(e) => setSlippage(e.target.value)}
+        >
+          <option value="10">0.1%</option>
+          <option value="50">0.5%</option>
+          <option value="100">1.0%</option>
+          <option value="300">3.0%</option>
+          <option value="500">5.0%</option>
+        </select>
+      </label>
+      {needsApproval && (
+        <Notice tone="warning">
+          <p>A sell quote needs an on-chain approval first.</p>
+          <p className="small">
+            Spender:{" "}
+            <a
+              className="address"
+              href={explorer(a.router)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {a.router}
+            </a>
+          </p>
+          <p>
+            Approval: <Amount value={parsed} digits={8} />. No sale is included.
+          </p>
+        </Notice>
+      )}
+      {quote ? (
+        <dl className="details quote-details">
+          <div>
+            <dt>Minimum receipt</dt>
+            <dd>
+              <Amount
+                value={quote.request.minOutput}
+                unit={buy ? "UNLK" : "test ETH credit"}
                 digits={8}
               />
-            </strong>
-            <span className="small muted">
-              {quote
-                ? stale
-                  ? "Quote expired. Refresh before signing."
-                  : "Simulated output, fees included"
-                : "Enter an amount for a simulated quote"}
-            </span>
+            </dd>
           </div>
-          <label className="setting" htmlFor="slippage">
-            Slippage tolerance
-            <select
-              id="slippage"
-              value={slippage}
-              onChange={(e) => setSlippage(e.target.value)}
-            >
-              <option value="10">0.1%</option>
-              <option value="50">0.5%</option>
-              <option value="100">1.0%</option>
-              <option value="300">3.0%</option>
-              <option value="500">5.0%</option>
-            </select>
-          </label>
-          {needsApproval && (
-            <Notice tone="warning">
-              <p>A sell quote needs an on-chain approval first.</p>
-              <p className="small">
-                Spender:{" "}
-                <a
-                  className="address"
-                  href={explorer(a.router)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {a.router}
-                </a>
-              </p>
-              <p>
-                Approval: <Amount value={parsed} digits={8} />. No sale is
-                included.
-              </p>
-            </Notice>
-          )}
-          {quote && (
-            <dl className="details quote-details">
-              <div>
-                <dt>Minimum receipt</dt>
-                <dd>
-                  <Amount
-                    value={quote.request.minOutput}
-                    unit={buy ? "UNLK" : "test ETH credit"}
-                    digits={8}
-                  />
-                </dd>
-              </div>
-              <div>
-                <dt>Actual input</dt>
-                <dd>
-                  <Amount
-                    value={quote.input}
-                    unit={buy ? "test ETH" : "UNLK"}
-                    digits={8}
-                  />
-                </dd>
-              </div>
-              <div>
-                <dt>Pool fee, included</dt>
-                <dd>
-                  <Amount
-                    value={quote.fee}
-                    unit={buy ? "test ETH" : "UNLK"}
-                    digits={8}
-                  />
-                </dd>
-              </div>
-              <div>
-                <dt>Estimated gas</dt>
-                <dd>
-                  ~
-                  <Amount
-                    value={quote.gas * quote.gasPrice}
-                    unit="test ETH"
-                    digits={8}
-                  />
-                </dd>
-              </div>
-              <div>
-                <dt>Quote at block</dt>
-                <dd>{quote.block.toString()}</dd>
-              </div>
-              <div>
-                <dt>Valid for</dt>
-                <dd>
-                  {stale
-                    ? "Expired"
-                    : `${Math.max(0, 45 - Math.floor((Date.now() - quote.time) / 1000))} seconds, at most 2 new blocks`}
-                </dd>
-              </div>
-            </dl>
-          )}
-          {quote && quote.input < quote.request.maxInput && (
-            <Notice tone="warning">
-              Partial fill: only{" "}
+          <div>
+            <dt>Actual input</dt>
+            <dd>
               <Amount
                 value={quote.input}
                 unit={buy ? "test ETH" : "UNLK"}
                 digits={8}
-              />{" "}
-              is spent.{" "}
-              {buy
-                ? "Unused ETH is credited for withdrawal."
-                : "Unspent UNLK returns to this wallet."}
-            </Notice>
-          )}
-          <p id="trade-error" role="status" className="error">
-            {error || d.walletError}
-          </p>
-          {!w.address ? (
-            <button className="button primary full" onClick={w.open}>
-              Connect to trade ↗
-            </button>
-          ) : w.network !== 11155111 ? (
-            <button className="button primary full" onClick={w.switchNetwork}>
-              Switch to Sepolia
-            </button>
-          ) : needsApproval ? (
-            <button
-              className="button primary full"
-              disabled={!walletReady || w.busy}
-              onClick={approve}
-            >
-              Review exact approval
-            </button>
-          ) : quote && !stale ? (
-            <button
-              className="button primary full"
-              disabled={w.busy || !walletReady}
-              onClick={execute}
-            >
-              Review {buy ? "buy" : "sell"} ↗
-            </button>
-          ) : (
-            <button
-              className="button primary full"
-              disabled={quoting || w.busy || !walletReady}
-              onClick={getQuote}
-            >
-              {quoting
-                ? "Simulating your trade…"
-                : stale
-                  ? "Refresh quote"
-                  : "Get a quote"}
-            </button>
-          )}
-          {quote && !stale && (
-            <button
-              className="text-button full"
-              disabled={quoting || w.busy}
-              onClick={getQuote}
-            >
-              Refresh quote
-            </button>
-          )}
-          <p className="small muted">
-            1.25% pool fee: 1% payer + 0.25% IMD. No extra hook fee. Price
-            limits stay within the seed range; exact-input trades may partially
-            fill. Quotes expire; execution depends on liquidity and pending
-            trades.
-          </p>
-        </section>
-      </div>
-      <DataStamp />
-      <Withdrawal />
-    </>
+              />
+            </dd>
+          </div>
+          <div>
+            <dt>Pool fee, included</dt>
+            <dd>
+              <Amount
+                value={quote.fee}
+                unit={buy ? "test ETH" : "UNLK"}
+                digits={8}
+              />
+            </dd>
+          </div>
+          <div>
+            <dt>Estimated gas</dt>
+            <dd>
+              ~
+              <Amount
+                value={quote.gas * quote.gasPrice}
+                unit="test ETH"
+                digits={8}
+              />
+            </dd>
+          </div>
+          <div>
+            <dt>Quote at block</dt>
+            <dd>{quote.block.toString()}</dd>
+          </div>
+          <div>
+            <dt>Valid for</dt>
+            <dd>
+              {stale
+                ? "Expired"
+                : `${Math.max(0, 45 - Math.floor((Date.now() - quote.time) / 1000))} seconds, at most 2 new blocks`}
+            </dd>
+          </div>
+        </dl>
+      ) : (
+        <dl className="details quote-details idle-quote">
+          <div>
+            <dt>Minimum receipt</dt>
+            <dd>Quote required</dd>
+          </div>
+          <div>
+            <dt>Pool fee</dt>
+            <dd>{s ? `${s.lpFee / 10000}%` : "1.25% configured"} · included</dd>
+          </div>
+          <div>
+            <dt>Gas estimate</dt>
+            <dd>
+              {reserved !== null ? (
+                <Amount value={reserved} unit="test ETH" digits={8} />
+              ) : (
+                "After simulation"
+              )}
+            </dd>
+          </div>
+        </dl>
+      )}
+      {quote && quote.input < quote.request.maxInput && (
+        <Notice tone="warning">
+          Partial fill: only{" "}
+          <Amount
+            value={quote.input}
+            unit={buy ? "test ETH" : "UNLK"}
+            digits={8}
+          />{" "}
+          is spent.{" "}
+          {buy
+            ? "Unused ETH is credited for withdrawal."
+            : "Unspent UNLK returns to this wallet."}
+        </Notice>
+      )}
+      {!buy && (
+        <p className="settlement-note">
+          Sales settle as ETH credit in the router.{" "}
+          <a href="#/unlock">Withdraw separately ↗</a>
+        </p>
+      )}
+      {(poolBlocker || (!buy && d.wallet?.within === 0n)) && (
+        <Notice tone="error">
+          {poolBlocker ||
+            "No current sell allowance. Transfers do not create acquisition credit."}
+        </Notice>
+      )}
+      <p id="trade-error" role="status" className="error">
+        {error || d.walletError}
+      </p>
+      {!w.address ? (
+        <button className="button primary full connect-trade" onClick={w.open}>
+          Connect to trade ↗
+        </button>
+      ) : w.network !== 11155111 ? (
+        <button className="button primary full" onClick={w.switchNetwork}>
+          Switch to Sepolia
+        </button>
+      ) : needsApproval ? (
+        <button
+          className="button primary full"
+          disabled={!walletReady || w.busy}
+          onClick={approve}
+        >
+          Review exact approval
+        </button>
+      ) : quote && !stale ? (
+        <button
+          className="button primary full"
+          disabled={w.busy || !walletReady}
+          onClick={execute}
+        >
+          Review {buy ? "buy" : "sell"} ↗
+        </button>
+      ) : (
+        <button
+          className="button primary full"
+          disabled={
+            quoting || filling || w.busy || !walletReady || !!poolBlocker
+          }
+          onClick={getQuote}
+        >
+          {quoting
+            ? "Simulating your trade…"
+            : stale
+              ? "Refresh quote"
+              : "Get a quote"}
+        </button>
+      )}
+      {quote && !stale && (
+        <button
+          className="text-button full"
+          disabled={quoting || w.busy}
+          onClick={getQuote}
+        >
+          Refresh quote
+        </button>
+      )}
+      <details className="trade-costs">
+        <summary>Fees & execution details</summary>
+        <p>
+          1.25% pool fee: 1% payer + 0.25% IMD. No extra hook fee. Actual fee
+          and gas are shown after simulation. Bounded exact-input trades may
+          partially fill. Unspent buy funding becomes withdrawable ETH credit.
+          Quotes expire after 45 seconds or two new blocks.
+        </p>
+      </details>
+    </section>
   );
 }
 export function Withdrawal() {

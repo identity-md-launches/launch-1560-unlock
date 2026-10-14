@@ -1,383 +1,368 @@
 {
-  "checkedAt": "2026-10-14T09:24:08.189Z",
+  "checkedAt": "2026-10-14T11:50:20.428Z",
   "pages": [
     {
-      "browser": "Chromium",
-      "route": "",
       "width": 320,
-      "scroll": 320,
-      "h1": "Freedom has a formula.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
-      "violations": []
-    },
-    {
-      "browser": "Chromium",
       "route": "trade",
-      "width": 320,
       "scroll": 320,
-      "h1": "Trade on your terms.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "UNLK / ETH",
+      "font": true,
+      "action": {
+        "x": 25,
+        "y": 876.59375,
+        "width": 270,
+        "height": 44,
+        "top": 876.59375,
+        "right": 295,
+        "bottom": 920.59375,
+        "left": 25
+      },
+      "chart": {
+        "x": 21,
+        "y": 474.59375,
+        "width": 278,
+        "height": 240,
+        "top": 474.59375,
+        "right": 299,
+        "bottom": 714.59375,
+        "left": 21
+      },
+      "form": {
+        "x": 12,
+        "y": 802.59375,
+        "width": 296,
+        "height": 579,
+        "top": 802.59375,
+        "right": 308,
+        "bottom": 1381.59375,
+        "left": 12
+      },
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 320,
       "route": "unlock",
-      "width": 320,
       "scroll": 320,
-      "h1": "Your balance. Your allowance.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "My Unlock",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 320,
       "route": "milestones",
-      "width": 320,
       "scroll": 320,
-      "h1": "Milestones, without promises.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Milestones",
+      "font": true,
+      "chart": {
+        "x": 21,
+        "y": 579.78125,
+        "width": 278,
+        "height": 240,
+        "top": 579.78125,
+        "right": 299,
+        "bottom": 819.78125,
+        "left": 21
+      },
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 320,
       "route": "activity",
-      "width": 320,
       "scroll": 320,
-      "h1": "An open record.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Holders & activity",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 320,
       "route": "how",
-      "width": 320,
       "scroll": 320,
-      "h1": "The rules are the product.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Rules & risks",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 320,
       "route": "contracts",
-      "width": 320,
       "scroll": 320,
-      "h1": "Trust the record. Inspect it.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Contracts & evidence",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
-      "route": "",
       "width": 390,
-      "scroll": 390,
-      "h1": "Freedom has a formula.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": true,
-      "violations": []
-    },
-    {
-      "browser": "Chromium",
       "route": "trade",
-      "width": 390,
       "scroll": 390,
-      "h1": "Trade on your terms.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": true,
+      "h1": "UNLK / ETH",
+      "font": true,
+      "action": {
+        "x": 25,
+        "y": 796.59375,
+        "width": 340,
+        "height": 44,
+        "top": 796.59375,
+        "right": 365,
+        "bottom": 840.59375,
+        "left": 25
+      },
+      "chart": {
+        "x": 21,
+        "y": 394.59375,
+        "width": 348,
+        "height": 240,
+        "top": 394.59375,
+        "right": 369,
+        "bottom": 634.59375,
+        "left": 21
+      },
+      "form": {
+        "x": 12,
+        "y": 722.59375,
+        "width": 366,
+        "height": 579,
+        "top": 722.59375,
+        "right": 378,
+        "bottom": 1301.59375,
+        "left": 12
+      },
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 390,
       "route": "unlock",
-      "width": 390,
       "scroll": 390,
-      "h1": "Your balance. Your allowance.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": true,
+      "h1": "My Unlock",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 390,
       "route": "milestones",
-      "width": 390,
       "scroll": 390,
-      "h1": "Milestones, without promises.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": true,
+      "h1": "Milestones",
+      "font": true,
+      "chart": {
+        "x": 21,
+        "y": 535.78125,
+        "width": 348,
+        "height": 240,
+        "top": 535.78125,
+        "right": 369,
+        "bottom": 775.78125,
+        "left": 21
+      },
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 390,
       "route": "activity",
-      "width": 390,
       "scroll": 390,
-      "h1": "An open record.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": true,
+      "h1": "Holders & activity",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 390,
       "route": "how",
-      "width": 390,
       "scroll": 390,
-      "h1": "The rules are the product.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": true,
+      "h1": "Rules & risks",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 390,
       "route": "contracts",
-      "width": 390,
       "scroll": 390,
-      "h1": "Trust the record. Inspect it.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": true,
+      "h1": "Contracts & evidence",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
-      "route": "",
       "width": 768,
-      "scroll": 768,
-      "h1": "Freedom has a formula.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
-      "violations": []
-    },
-    {
-      "browser": "Chromium",
       "route": "trade",
-      "width": 768,
       "scroll": 768,
-      "h1": "Trade on your terms.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "UNLK / ETH",
+      "font": true,
+      "action": {
+        "x": 41,
+        "y": 1337.1875,
+        "width": 686,
+        "height": 44,
+        "top": 1337.1875,
+        "right": 727,
+        "bottom": 1381.1875,
+        "left": 41
+      },
+      "chart": {
+        "x": 37,
+        "y": 550.1875,
+        "width": 694,
+        "height": 280,
+        "top": 550.1875,
+        "right": 731,
+        "bottom": 830.1875,
+        "left": 37
+      },
+      "form": {
+        "x": 24,
+        "y": 1013.1875,
+        "width": 720,
+        "height": 429,
+        "top": 1013.1875,
+        "right": 744,
+        "bottom": 1442.1875,
+        "left": 24
+      },
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 768,
       "route": "unlock",
-      "width": 768,
       "scroll": 768,
-      "h1": "Your balance. Your allowance.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "My Unlock",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 768,
       "route": "milestones",
-      "width": 768,
       "scroll": 768,
-      "h1": "Milestones, without promises.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Milestones",
+      "font": true,
+      "chart": {
+        "x": 37,
+        "y": 506.1875,
+        "width": 694,
+        "height": 280,
+        "top": 506.1875,
+        "right": 731,
+        "bottom": 786.1875,
+        "left": 37
+      },
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 768,
       "route": "activity",
-      "width": 768,
       "scroll": 768,
-      "h1": "An open record.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Holders & activity",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 768,
       "route": "how",
-      "width": 768,
       "scroll": 768,
-      "h1": "The rules are the product.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Rules & risks",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 768,
       "route": "contracts",
-      "width": 768,
       "scroll": 768,
-      "h1": "Trust the record. Inspect it.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Contracts & evidence",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
-      "route": "",
       "width": 1440,
-      "scroll": 1440,
-      "h1": "Freedom has a formula.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
-      "violations": []
-    },
-    {
-      "browser": "Chromium",
       "route": "trade",
-      "width": 1440,
       "scroll": 1440,
-      "h1": "Trade on your terms.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "UNLK / ETH",
+      "font": true,
+      "action": {
+        "x": 1017,
+        "y": 733.1875,
+        "width": 326,
+        "height": 44,
+        "top": 733.1875,
+        "right": 1343,
+        "bottom": 777.1875,
+        "left": 1017
+      },
+      "chart": {
+        "x": 101,
+        "y": 401.1875,
+        "width": 862,
+        "height": 280,
+        "top": 401.1875,
+        "right": 963,
+        "bottom": 681.1875,
+        "left": 101
+      },
+      "form": {
+        "x": 1000,
+        "y": 265.1875,
+        "width": 360,
+        "height": 569,
+        "top": 265.1875,
+        "right": 1360,
+        "bottom": 834.1875,
+        "left": 1000
+      },
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 1440,
       "route": "unlock",
-      "width": 1440,
       "scroll": 1440,
-      "h1": "Your balance. Your allowance.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "My Unlock",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 1440,
       "route": "milestones",
-      "width": 1440,
       "scroll": 1440,
-      "h1": "Milestones, without promises.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Milestones",
+      "font": true,
+      "chart": {
+        "x": 101,
+        "y": 434.1875,
+        "width": 958,
+        "height": 280,
+        "top": 434.1875,
+        "right": 1059,
+        "bottom": 714.1875,
+        "left": 101
+      },
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 1440,
       "route": "activity",
-      "width": 1440,
       "scroll": 1440,
-      "h1": "An open record.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Holders & activity",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
+      "width": 1440,
       "route": "how",
-      "width": 1440,
       "scroll": 1440,
-      "h1": "The rules are the product.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Rules & risks",
+      "font": true,
       "violations": []
     },
     {
-      "browser": "Chromium",
-      "route": "contracts",
       "width": 1440,
+      "route": "contracts",
       "scroll": 1440,
-      "h1": "Trust the record. Inspect it.",
-      "fonts": [
-        true,
-        true
-      ],
-      "accessibilityAudited": false,
+      "h1": "Contracts & evidence",
+      "font": true,
       "violations": []
     }
   ],
   "interactions": [
-    "Mobile Trade entry, connect dialog, Escape close",
-    "Scenario 35% and full-unlock outputs; transfer-only E=0 scenario",
-    "FAQ pointer and keyboard disclosure",
-    "Buy/Sell direction, decimal amount and slippage selection",
-    "Holder filter, activity tab and event filter",
-    "Skip link retains route and focuses main",
-    "Connect control is available before RPC reads, including offline"
+    "Touch milestone selection; ArrowRight and End keyboard selection; final checkpoint explicitly describes full quota bypass",
+    "Real event history, All/1H range selection, accessible event slider and touch crosshair/tooltip",
+    "Manual amount, slippage, sell-credit copy; mobile wallet-browser links, Coinbase Smart Wallet, dialog Escape and focus restoration",
+    "Exact worked-example and transfer-only scenarios, full-unlock W behavior and invalid scenario input",
+    "Keyboard FAQ disclosures; activity and holder filtering, event type selection",
+    "Skip link focuses the current main without changing route",
+    "Offline rules and selection work; no fabricated balances, chart series, confirmed tier or FDV; wallet picker remains responsive"
   ],
   "errors": [],
-  "webkit": {
-    "passed": false,
-    "error": "Error: browserType.launch: \n╔══════════════════════════════════════════════════════╗\n║ Host system is missing dependencies to run browsers. ║\n║ Missing libraries:                                   ║\n║     libgtk-4.so.1                                    ║\n║     libpangocairo-1.0.so.0                           ║\n║     libgdk_pixbuf-2.0.so.0                           ║\n║     libcairo-gobject.so.2                            ║\n║     libgraphene-1.0.so.0                             ║\n║     liblcms2.so.2                                    ║\n║     libwoff2dec.so.1.0.2                             ║\n║     libvpx.so.9                                      ║\n║     libevent-2.1.so.7                                ║\n║     libopus.so.0                                     ║\n║     libgstallocators-1.0.so.0                        ║\n║     libgstapp-1.0.so.0                               ║\n║     libgstpbutils-1.0.so.0                           ║\n║     libgstaudio-1.0.so.0                             ║\n║     libgsttag-1.0.so.0                               ║\n║     libgstvideo-1.0.so.0                             ║\n║     libgstgl-1.0.so.0                                ║\n║     libgstcodecparsers-1.0.so.0                      ║\n║     libgstfft-1.0.so.0                               ║\n║     libflite.so.1                                    ║\n║     libflite_usenglish.so.1                          ║\n║     libflite_cmu_grapheme_lang.so.1                  ║\n║     libflite_cmu_grapheme_lex.so.1                   ║\n║     libflite_cmu_indic_lang.so.1                     ║\n║     libflite_cmu_indic_lex.so.1                      ║\n║     libflite_cmulex.so.1                             ║\n║     libflite_cmu_time_awb.so.1                       ║\n║     libflite_cmu_us_awb.so.1                         ║\n║     libflite_cmu_us_kal16.so.1                       ║\n║     libflite_cmu_us_kal.so.1                         ║\n║     libflite_cmu_us_rms.so.1                         ║\n║     libflite_cmu_us_slt.so.1                         ║\n║     libwebpdemux.so.2                                ║\n║     libavif.so.16                                    ║\n║     libharfbuzz-icu.so.0                             ║\n║     libepoxy.so.0                                    ║\n║     libwebpmux.so.3                                  ║\n║     libenchant-2.so.2                                ║\n║     libsecret-1.so.0                                 ║\n║     libhyphen.so.0                                   ║\n║     libwayland-server.so.0                           ║\n║     libwayland-egl.so.1                              ║\n║     libwayland-client.so.0                           ║\n║     libmanette-0.2.so.0                              ║\n║     libGLESv2.so.2                                   ║\n║     libx264.so                                       ║\n╚══════════════════════════════════════════════════════╝"
-  }
+  "limitations": []
 }

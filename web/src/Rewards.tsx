@@ -315,7 +315,7 @@ export function Rewards() {
     <section className="rewards-section" id="rewards">
       <div className="section-heading">
         <div>
-          <h2>Rewards, one verified step at a time.</h2>
+          <h2>Rewards & acquisition credit</h2>
           <p>
             Receiving tokens and crediting your cumulative acquisitions are
             separate actions.

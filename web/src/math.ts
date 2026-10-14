@@ -172,8 +172,8 @@ export function confirmationState(s: {
     };
   const required = s.tier === 5 ? s.finalConfirmation : s.confirmation;
   const elapsed =
-    s.qualifyingSince > 0n && s.timestamp > s.qualifyingSince
-      ? s.timestamp - s.qualifyingSince
+    s.qualifyingSince > 0n && s.lastConfirmation >= s.qualifyingSince
+      ? s.lastConfirmation - s.qualifyingSince
       : 0n;
   const gap = s.timestamp - s.lastConfirmation;
   let label = "Waiting for a qualifying observation";
@@ -193,7 +193,11 @@ export function confirmationState(s: {
   else if (gap < s.minInterval)
     label = "Confirming · minimum interval not yet reached";
   else label = "Confirming · another valid update is needed";
-  const active = s.qualifyingSince > 0n && gap <= s.maxGap;
+  const active =
+    s.qualifyingSince > 0n &&
+    gap <= s.maxGap &&
+    s.fdv !== null &&
+    s.fdv >= BigInt(TARGETS[s.tier + 1]) * UNIT;
   return {
     label,
     elapsed,
@@ -203,3 +207,14 @@ export function confirmationState(s: {
       : 0,
   };
 }
+
+// Shortcuts only fill the form. All amounts remain integer token/native wei.
+export function shortcutAmount(balance: bigint, percent: number, reserve = 0n) {
+  if (balance < 0n || reserve < 0n || ![25, 50, 75, 100].includes(percent))
+    throw Error("Invalid shortcut inputs");
+  return (
+    ((balance > reserve ? balance - reserve : 0n) * BigInt(percent)) / 100n
+  );
+}
+export const gasReserve = (gas: bigint, price: bigint) =>
+  ceilDiv(gas * price * 120n, 100n);

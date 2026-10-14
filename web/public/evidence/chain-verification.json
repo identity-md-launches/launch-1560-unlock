@@ -1,9 +1,9 @@
 {
   "sourceCommit": "ea89426f3fe9df79096a5e02345fc8821bd1c783",
-  "checkedAt": "2026-10-14T09:25:42.859Z",
-  "block": "11912346",
-  "blockHash": "0x2781d3032aeaef820c254db64fe59108c6ec88b11333a77bb642dd0a76c08161",
-  "blockTimestamp": "1791969936",
+  "checkedAt": "2026-10-14T11:43:35.968Z",
+  "block": "11913027",
+  "blockHash": "0x7afe16b177e26868fc0ec99cd25706cbfe2241add75c2175063243beefcb548c",
+  "blockTimestamp": "1791978204",
   "checks": {
     "chain": true,
     "router": true,
@@ -113,8 +113,8 @@
     "lower": -887220,
     "upper": 177240,
     "slot0": [
-      "558675390148875123753125616640746",
-      177228,
+      "551744011987882003553169792537470",
+      176979,
       0,
       12500
     ],
@@ -132,7 +132,7 @@
     },
     "count": "1",
     "certified": true,
-    "observationCount": "2",
+    "observationCount": "5",
     "fdv": null
   },
   "constants": {

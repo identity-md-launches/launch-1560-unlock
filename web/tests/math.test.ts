@@ -96,7 +96,7 @@ test("oracle progress distinguishes invalid, stale, gap, below target and elapse
   assert.equal(confirmationState({ ...base, timestamp: 2700n }).progress, 0);
   assert.match(confirmationState({ ...base, fdv: 1n }).label, /resets/);
   assert.match(
-    confirmationState({ ...base, timestamp: 22600n, lastConfirmation: 22500n })
+    confirmationState({ ...base, timestamp: 22700n, lastConfirmation: 22600n })
       .label,
     /valid on-chain update/,
   );
@@ -178,4 +178,33 @@ test("swap step accounts exact fees and partial fills in both directions", () =>
       ((partial.input - partial.fee) * 12500n + 987499n) / 987500n,
     );
   }
+});
+
+test("percentage fills floor in wei, reserve gas and never exceed spendable balance", async () => {
+  const { shortcutAmount, gasReserve } = await import("../src/math");
+  const reserve = gasReserve(230001n, 17000000000n);
+  assert.equal(reserve, 4692020400000000n);
+  for (const percent of [25, 50, 75, 100]) {
+    const result = shortcutAmount(UNIT, percent, reserve);
+    assert.equal(result, ((UNIT - reserve) * BigInt(percent)) / 100n);
+    assert.ok(result + reserve <= UNIT);
+  }
+  assert.equal(shortcutAmount(7n, 25), 1n);
+  assert.equal(shortcutAmount(10n, 100, 11n), 0n);
+  assert.throws(() => shortcutAmount(10n, 101));
+  assert.throws(() => shortcutAmount(-1n, 25));
+});
+test("confirmation progress does not increase merely because the clock advances", () => {
+  const s = {
+    ...base,
+    qualifyingSince: 1000n,
+    lastConfirmation: 2000n,
+    timestamp: 2001n,
+  };
+  assert.equal(
+    confirmationState(s).progress,
+    confirmationState({ ...s, timestamp: 2200n }).progress,
+  );
+  assert.equal(confirmationState({ ...s, fdv: null }).progress, 0);
+  assert.equal(confirmationState({ ...s, fdv: 1n }).progress, 0);
 });

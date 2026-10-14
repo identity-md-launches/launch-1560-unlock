@@ -5,7 +5,6 @@ import { useWallet } from "./wallet";
 import {
   abi,
   addresses as a,
-  BUY_PROOF,
   explorer,
   REPO,
   source,
@@ -17,10 +16,8 @@ import {
   Amount,
   AddressLink,
   DataStamp,
-  Emblem,
   Notice,
   PageHeading,
-  SectionLink,
   Stat,
 } from "./components";
 import {
@@ -40,217 +37,8 @@ import {
 } from "./math";
 import { Withdrawal } from "./Trade";
 import { Rewards } from "./Rewards";
-export function Home() {
-  const d = useData();
-  const s = d.snapshot;
-  const nativeClaim = d.index?.events.find((e) => e.kind === "Claimed");
-  return (
-    <>
-      <section className="hero">
-        <div className="hero-copy">
-          <h1>
-            Freedom has <br />a <em>formula.</em>
-          </h1>
-          <p className="hero-description">
-            UNLOCK is a Sepolia token with cumulative sell allowances and
-            permanent milestones.
-          </p>
-          <div className="hero-actions">
-            <a className="button primary" href="#/trade">
-              Trade UNLK <span aria-hidden="true">↗</span>
-            </a>
-            <a className="text-link" href="#/how">
-              Understand the rules <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-          <p className="brand-line">Diamond hands. Transparent rules.</p>
-        </div>
-        <div className="hero-art">
-          <div className="art-coordinate">UNLK / 1560</div>
-          <Emblem large />
-          <div className="art-readout">
-            <span>Current acquisition allowance</span>
-            <strong>{s ? `${Number(s.p) / 100}%` : "Reading…"}</strong>
-            <span>
-              {s?.fullyUnlocked
-                ? "Permanently unlocked"
-                : s
-                  ? `Tier ${s.tier} of 6 · rights never decrease`
-                  : "Earned rights come from on-chain state"}
-            </span>
-          </div>
-        </div>
-      </section>
-      <div className="stat-strip">
-        <Stat
-          label="Verified milestone FDV"
-          value={usd(s?.fdv)}
-          note={
-            s?.fdv == null
-              ? "A valid oracle reading is required"
-              : "Two-hour TWAP × valid ETH/USD"
-          }
-        />
-        <Stat
-          label="Indicative spot FDV"
-          value={usd(s?.spotFdv)}
-          note="Current pool price × 1B supply"
-        />
-        <Stat
-          label="Next milestone"
-          value={
-            s
-              ? s.fullyUnlocked
-                ? "All achieved"
-                : `$${TARGETS[s.tier + 1].toLocaleString("en-US")}`
-              : "Reading…"
-          }
-          note="Targets may never be reached"
-        />
-        <Stat
-          label="Total token supply"
-          value="1,000,000,000"
-          note="UNLK · 18 decimals · minted once"
-        />
-      </div>
-      <DataStamp />
-      <section className="editorial-row">
-        <div>
-          <h2>
-            Acquisitions accumulate.
-            <br />
-            <em>Rights endure.</em>
-          </h2>
-          <p>
-            Official buys and proven allocation credits build your acquisition
-            record. A percentage of that record determines your cumulative sell
-            allowance. What you have already sold counts against it.
-          </p>
-          <SectionLink to="unlock">See your allowance</SectionLink>
-        </div>
-        <div className="rule-visual">
-          <div>
-            <span>Initially</span>
-            <strong>
-              25<span>%</span>
-            </strong>
-            <p>of eligible acquisitions, less sales already used</p>
-          </div>
-          <span className="rule-arrow" aria-hidden="true">
-            →
-          </span>
-          <div>
-            <span>After the final milestone</span>
-            <strong>
-              100<span>%</span>
-            </strong>
-            <p>of your balance, including transferred tokens</p>
-          </div>
-        </div>
-      </section>
-      <section className="progress-section">
-        <div className="section-heading">
-          <div>
-            <h2>Progress you can verify.</h2>
-            <p>Published facts, distinct from tests that remain pending.</p>
-          </div>
-          <a className="text-link" href="#/contracts">
-            Inspect the contracts ↗
-          </a>
-        </div>
-        <ol className="proof-list">
-          <li>
-            <span className="proof-icon">✓</span>
-            <div>
-              <h3>Existing Sepolia launch</h3>
-              <p>
-                Launch 1560. One fixed token and one official native ETH pool.
-              </p>
-            </div>
-            <a
-              href={explorer(
-                "0x1e53a756a65fe0d5d04085e69ab8a34ea702ff142268ba3ab1506f0c62b1af1c",
-                "tx",
-              )}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Deployment ↗
-            </a>
-          </li>
-          <li>
-            <span className="proof-icon">✓</span>
-            <div>
-              <h3>Activated and source matched</h3>
-              <p>
-                Companion runtimes and reciprocal bindings were checked against
-                the accepted source.
-              </p>
-            </div>
-            <a
-              href="./evidence/chain-verification.json"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Read evidence ↗
-            </a>
-          </li>
-          <li>
-            <span className="proof-icon">✓</span>
-            <div>
-              <h3>Public buy confirmed</h3>
-              <p>The existing buy receipt succeeds through the bound router.</p>
-            </div>
-            <a
-              href={explorer(BUY_PROOF, "tx")}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Buy receipt ↗
-            </a>
-          </li>
-          <li>
-            <span className="proof-icon pending">○</span>
-            <div>
-              <h3>Sell and complete reward-flow proof</h3>
-              <p>
-                {nativeClaim
-                  ? "A native claim is now visible on chain. Public sell and full claim / attestation / sync evidence remain pending."
-                  : "Pending in the supplied launch evidence. Local tests do not establish a public transaction."}
-              </p>
-            </div>
-            {nativeClaim ? (
-              <a
-                href={explorer(nativeClaim.hash, "tx")}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Native claim ↗
-              </a>
-            ) : (
-              <a href="#/activity">Read live activity ↗</a>
-            )}
-          </li>
-        </ol>
-      </section>
-      <div className="bottom-editorial">
-        <h2>
-          A financial experiment.
-          <br />
-          <em>Open to inspection.</em>
-        </h2>
-        <div>
-          <p>
-            Fixed rules do not promise a price, a milestone or a return. This
-            experiment applies to its official pool; freely transferable UNLK
-            can trade elsewhere.
-          </p>
-          <SectionLink to="how">Read the mechanics and risks</SectionLink>
-        </div>
-      </div>
-    </>
-  );
-}
+import { WalletOverview } from "./Unlock";
+import { UnlockLadder } from "./charts";
 export function MyUnlock() {
   const d = useData();
   const w = useWallet();
@@ -258,129 +46,10 @@ export function MyUnlock() {
   const v = d.wallet;
   return (
     <>
-      <PageHeading title="Your balance. Your allowance.">
-        Tokens stay in your wallet. This page explains how much is within the
-        official pool’s current sell allowance.
+      <PageHeading title="My Unlock">
+        Your balance, cumulative acquisitions and official-pool sell allowance.
       </PageHeading>
-      {!w.address ? (
-        <div className="connect-panel">
-          <Emblem />
-          <div>
-            <h2>Read your place in the experiment.</h2>
-            <p>
-              Connecting only reads your wallet. It does not request an
-              approval, signature or trade.
-            </p>
-            <button className="button primary" onClick={w.open}>
-              Connect wallet ↗
-            </button>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="wallet-heading">
-            <AddressLink address={w.address} />
-            <span className="tag">
-              {s?.fullyUnlocked
-                ? "Permanently unlocked"
-                : s
-                  ? `${Number(s.p) / 100}% acquisition rate`
-                  : "Reading rate…"}
-            </span>
-          </div>
-          {d.walletError && (
-            <Notice tone="warning">
-              Wallet read failed: {d.walletError}. Previously read values are
-              shown; retry before trading.
-            </Notice>
-          )}
-          {v ? (
-            <>
-              {s && v.block !== s.block && (
-                <p className="small muted">
-                  Wallet values at block {v.block.toString()}; refreshing for
-                  the latest block.
-                </p>
-              )}
-              <div className="allowance-overview">
-                <div className="allowance-main">
-                  <span>Within your current sell allowance</span>
-                  <strong>
-                    <Amount value={v.within} />
-                  </strong>
-                  <a className="text-link" href="#/trade">
-                    Open trading workspace ↗
-                  </a>
-                </div>
-                <div>
-                  <span>Outside your current allowance</span>
-                  <strong>
-                    <Amount value={v.outside} />
-                  </strong>
-                  <p>
-                    These are freely transferable wallet tokens. They are not
-                    escrowed or locked.
-                  </p>
-                </div>
-              </div>
-              <div
-                className="allowance-bar"
-                role="img"
-                aria-label={`${number(v.within)} UNLK within allowance, ${number(v.outside)} outside allowance`}
-              >
-                <span
-                  style={{
-                    width: `${v.W === 0n ? 0 : Number((v.within * 10000n) / v.W) / 100}%`,
-                  }}
-                />
-              </div>
-              <dl className="ledger">
-                <div>
-                  <dt>W · Wallet balance</dt>
-                  <dd>
-                    <Amount value={v.W} />
-                  </dd>
-                </div>
-                <div>
-                  <dt>E · Cumulative eligible acquisitions</dt>
-                  <dd>
-                    <Amount value={v.E} />
-                  </dd>
-                </div>
-                <div>
-                  <dt>S · Sales already used</dt>
-                  <dd>
-                    <Amount value={v.S} />
-                  </dd>
-                </div>
-                <div>
-                  <dt>p · Achieved acquisition rate</dt>
-                  <dd>{s ? Number(s.p) / 100 : 0}%</dd>
-                </div>
-              </dl>
-              {!s?.fullyUnlocked && v.E === 0n && v.W > 0n && (
-                <Notice tone="warning">
-                  This wallet holds transferred tokens with no eligible
-                  acquisition credit. Its sell allowance in this pool is zero
-                  until it gains valid credit or the final permanent unlock
-                  occurs.
-                </Notice>
-              )}
-              <p className="small muted">
-                {s?.fullyUnlocked
-                  ? "Full unlock: C = W for every holder. No quota limit is displayed."
-                  : "Q = max(0, floor(E × p / 10,000) − S). C = min(W, Q), calculated in exact token wei."}{" "}
-                Executable sales also depend on liquidity, fees, approval and
-                pending trades.
-              </p>
-            </>
-          ) : (
-            <Notice>
-              {d.walletError || "Reading balances at the current block…"}
-            </Notice>
-          )}
-        </>
-      )}
+      <WalletOverview />
       {s && s.pendingPayer[1] > 0n && (
         <section className="payer-sync">
           <h2>Original payer allocation</h2>
@@ -451,7 +120,7 @@ export function Milestones() {
     : null;
   return (
     <>
-      <PageHeading title="Milestones, without promises.">
+      <PageHeading title="Milestones">
         Verified targets raise cumulative sell rights permanently. Falling
         prices never revoke an achieved tier.
       </PageHeading>
@@ -472,42 +141,14 @@ export function Milestones() {
           note="Removes quotas for all holders"
         />
       </div>
-      <ol className="milestone-ladder">
-        {RATES.map((r, i) => (
-          <li key={String(r)} className={s && i <= s.tier ? "achieved" : ""}>
-            <span className="milestone-node" aria-hidden="true">
-              {s && i <= s.tier ? "✓" : String(i)}
-            </span>
-            <div>
-              <strong>
-                {i === 0
-                  ? "Initial rule"
-                  : `$${TARGETS[i].toLocaleString("en-US")}`}
-              </strong>
-              <span>
-                {i === 0
-                  ? "At activation"
-                  : i === 6
-                    ? "24h final confirmation"
-                    : "Sequential 6h confirmation"}
-              </span>
-            </div>
-            <strong>{Number(r) / 100}%</strong>
-            <span className="small">
-              {s && i <= s.tier
-                ? "Achieved"
-                : i === 6
-                  ? "All balances"
-                  : "Of eligible acquisitions"}
-            </span>
-          </li>
-        ))}
-      </ol>
+      <section className="panel milestone-chart">
+        <UnlockLadder />
+      </section>
       <OraclePanel />
       <section className="scenario-section">
         <div className="section-heading">
           <div>
-            <h2>Explore a future allowance.</h2>
+            <h2>Hypothetical allowance</h2>
             <p>
               Hypothetical results. W, E and S stay fixed; no future price or
               execution is promised.
@@ -611,7 +252,7 @@ export function Milestones() {
             </p>
           </div>
         </div>
-        <details open>
+        <details>
           <summary>Why cumulative acquisitions matter</summary>
           <p>
             Example: buy 1,000 UNLK, sell 250, then buy 500 more. E is 1,500, S
@@ -650,7 +291,7 @@ export function OraclePanel() {
           <div
             className="progress-track"
             role="progressbar"
-            aria-label="Recorded confirmation progress"
+            aria-label="Progress from recorded valid confirmations, not elapsed wall-clock time"
             aria-valuenow={status?.progress ?? 0}
             aria-valuemin={0}
             aria-valuemax={100}
@@ -832,7 +473,7 @@ export function Activity() {
   const active = Math.min(page, pages - 1);
   return (
     <>
-      <PageHeading title="An open record.">
+      <PageHeading title="Holders & activity">
         Real token holders and contract activity, indexed from verified Sepolia
         events.
       </PageHeading>
@@ -987,9 +628,11 @@ export function Activity() {
                   <td data-label="Event / time">
                     <strong>
                       {e.kind === "Executed"
-                        ? swap?.amount0 && swap.amount0 < 0n
-                          ? "Buy executed"
-                          : "Sell executed"
+                        ? swap?.amount0 == null
+                          ? "Swap executed"
+                          : swap.amount0 < 0n
+                            ? "↗ Buy executed"
+                            : "↘ Sell executed"
                         : e.kind}
                     </strong>
                     <span className="small muted">
@@ -1132,12 +775,11 @@ const FAQs: [string, string][] = [
 export function HowItWorks() {
   return (
     <>
-      <PageHeading title="The rules are the product.">
+      <PageHeading title="Rules & risks">
         A transparent experiment in cumulative acquisitions, earned sell rights
         and permanent unlock.
       </PageHeading>
       <div className="how-intro">
-        <Emblem large />
         <div>
           <h2>
             One balance.
@@ -1207,7 +849,7 @@ export function Contracts() {
   ];
   return (
     <>
-      <PageHeading title="Trust the record. Inspect it.">
+      <PageHeading title="Contracts & evidence">
         The existing Sepolia deployment, its verified bindings and the limits of
         the evidence.
       </PageHeading>

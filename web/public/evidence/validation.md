@@ -1,77 +1,101 @@
-# UNLOCK website · worker validation
+# UNLOCK terminal redesign validation
 
-Checked 2026-10-14 against existing Sepolia launch 1560, chain 11155111. This record describes the worker’s own checks and limitations; it is not independent certification or an audit. No public transaction, token/pool deployment, mainnet interaction or change to IMD Explorer was performed.
+Date: 2026-10-14. Accepted website base: `b01b41bfdf20a20519c5902eda3d0677b7f2b6df`. Deployed contract source pin: `ea89426f3fe9df79096a5e02345fc8821bd1c783`. This is a frontend continuation, not protocol activation. No contract, dependency manifest, lockfile, existing build configuration, ignore file or Git metadata was changed. No public transaction, deployment, mainnet operation or signing key was used.
 
-## Delivered and reconciled
+## Delivered interface
 
-React 19, TypeScript, Vite source and exact npm lockfile are in `web/`; the production static export is in root `dist/`. Its assets are relative, fonts/brand images are local, and navigation uses hash routes. The export was exercised under `/preview/`, not only at an origin root. No backend, private credential, relay project ID, node_modules, package cache, registry mirror, dependency archive or submodule is required in the submission. No ignore file was changed.
+The old cream/serif hero and oversized diamond are replaced by a compact black terminal. The entry view contains four status metrics, an original seven-checkpoint categorical Unlock ladder beside Buy/Sell, then a wallet ledger, real trade/holder preview and expandable operational detail. Local JetBrains Mono, original share art, small emblem, accessible focus and relative static assets are bundled. The existing Coinbase SDK is dynamically loaded; no new dependency was added.
 
-Read-only GitHub reconciliation returned main `ea89426f3fe9df79096a5e02345fc8821bd1c783`, the supplied accepted source. Existing Solidity source, Foundry configuration, dependencies, `.github`, `.git` and environment files were preserved. The contributor publisher performs GitHub/IPFS hosting from the submitted `dist/`; the worker did not produce a hosting URL or CID.
+Desktop/mobile screenshots of https://sat0.org/ and the old accepted UNLK export were rendered and inspected before implementation. Final screenshots were compared with them: Sato's compact panel/grid character informed density, but UNLK uses its own milestone staircase, allowance semantics, branding and text. No Sato price/supply curve, asset or copy was reused. The final 1440×900 form ends at y=834.2; the 390×844 Connect to trade action ends at y=840.6. The mobile ladder is 240px high; desktop is 280px. A 320px viewport reflows without horizontal overflow, though the trading action requires scrolling at that narrower width.
 
-## Build and executable checks
+Screenshot artifacts: `screenshots/sato-1440.png`, `sato-390.png`, `old-unlk-1440.png`, `old-unlk-390.png`, `unlk-1440.png`, `unlk-390.png`, `unlk-mobile-selection.png`, `unlk-market-history.png`, `unlk-offline.png`, `unlk-webkit-1440.png`, `unlk-webkit-390.png`. Screenshot paths are relative to the contributor's `artifacts/` bundle, not runtime dependencies.
 
-| Check | Actual result |
-| --- | --- |
-| `npm --prefix web run typecheck` | Passed, strict `tsc --noEmit` |
-| `npm --prefix web test` | 8 passed, 0 failed: exact units/floors/caps, scenarios, all tiers/large values, inputs/slippage, oracle state labels, authentic Merkle trees and recorded live arithmetic |
-| `npm --prefix web run build` | Passed; Vite production export in `dist/`, no source maps or external font dependency |
-| `forge build --skip test --skip script` | Passed using unchanged Solidity configuration |
-| `npm --prefix web run verify:chain` | All recorded checks passed at block 11912346; canonical token/hook ABI hashes and all shipped frontend/download ABI copies, five normalized runtime matches, reciprocal bindings, activated setup, supply/decimals, exact PoolKey/PoolId, existing buy receipt |
-| `npm --prefix web run verify:live` | At block 11912146, three real actual-payer buy `eth_call` simulations match exact input, output and fee; three nonzero holders’ quota arithmetic agrees with the hook; all 459 native round-0 proofs verify and reconstruct its unique-recipient root |
-| `forge test --match-contract 'TradingTest\|SeedBoundaryTest\|NativeLaunchTest\|ClaimLifecycleInvariants\|OracleTest\|CreditsAndFeesTest' -vv` | 49 tests passed in 6 suites, 0 failures |
-| `forge test --match-contract 'NativeWithdrawalTest\|NativeCustodyInvariantsTest\|QuotaInvariantTest' -vv` | 15 tests passed in 3 suites, 0 failures; includes direct-route contract-wallet native custody and withdrawals |
-| `node --import tsx scripts/check-swap-math.ts` (in `web/`), then `forge test --match-contract FrontendSwapMathTest -vv` | 14 exact BigInt vectors passed against the vendored Solidity v4 `SwapMath`: both directions, one-wei inputs, large inputs, full and partial fills |
-| `node --import tsx scripts/check-allowance-math.ts` (in `web/`), then `forge test --match-contract FrontendAllowanceTest -vv` | 43 ledger vectors passed against actual `UnlkHook.remainingQuota` in the existing local fixture: all tiers, transfers with E=0, balances below quota, used quota, zero balances, uint256 extremes and the separate full-unlock bit |
-| Public RPC availability | Three configured endpoints returned Sepolia chain ID, with CORS, in direct read-only checks; see `rpc-check.json` |
+## Production and interaction results
 
-The two cross-language generators retain their source in `web/scripts/` and write disposable Solidity fixtures only to `test/scratch/`. Artificial ledger boundaries are local tests, never public state overrides. Existing contract compilation emitted a pre-existing mutability suggestion for `UnlkHook.afterInitialize`; no contract source was changed.
+| Check | Actual result | Evidence |
+| --- | --- | --- |
+| Existing production build | PASS; TypeScript then Vite, relative asset export | `build.txt` |
+| Standalone TypeScript | PASS | `typecheck.txt` |
+| Frontend unit tests | 10 PASS: allowance, rounding, full bypass, swap math, parsing, confirmation/reset and shortcut gas reserve | `frontend-tests.txt` |
+| Existing contract regressions | 64 PASS in 9 suites | `test-results.txt` |
+| Cross-language math | 2 PASS: 14 v4 swap vectors and 43 quota vectors checked in Solidity | `cross-language-tests.txt`, `swap-math-vectors.json`, `allowance-vectors.json` |
+| Deployed bindings/ABI/runtime | 35 PASS at Sepolia block 11913027; five companion/token/hook runtime matches and pinned ABI consistency | `chain-verification.json` |
+| Live data/simulation | 3 exact buy simulations; all 459 authentic round-0 proofs; 3 holder ledgers agree with contract quota | `live-interactions.json` |
+| Chromium production UI | 24 views: six routes × 320/390/768/1440. No overflow, script errors or missing local resources. Axe at 390 on all six routes: zero violations | `browser-validation.json` |
+| Wallet state/provider fixtures | 8 checks PASS: connection has no signing, chain switch, simulation, quote expiry, rejected send, sell route, account changes and reward network guard | `wallet-validation.json` |
+| Recovery/outage fixtures | 5 checks PASS: real RPC fallback, authentic proof fallback, pending reload, existing confirmed receipt and explicitly injected revert | `recovery-validation.json` |
+| Disposable local fork UI | 8 checks PASS, 7 UI-confirmed local transactions: Buy, exact approval, Sell, withdrawal, native claim, evidence attestation, hook sync | `fork-validation.json` |
+| WebKit | 320/390/1440 reflow and font checks; chart, wallet dialog/Escape and Sell input/slippage passed | `webkit-validation.json` |
+| Contrast | 24 token/surface pairs meet relevant text/control thresholds | `contrast.json` |
+| Pinned design probe | 14/16 raw PASS, two reviewed exceptions below | `design-probe.json` |
+| Submission/static export | Path, size, relative URL, public-asset completeness and metadata audit | `submission-check.json` |
 
-The live verification snapshot records p=2500, tier=0, full unlock=false. Oracle FDV was unavailable because its checkpoint was stale; the UI represents that as unavailable, without turning it into a zero price or denying otherwise valid trades. The real seed range and quote capacity come from the live launch; older illustrative values in historical documentation are not used as current data.
+Chromium interactions include touch milestone selection, Arrow/Home/End navigation, full-bypass explanation, history ranges/crosshair/event slider, manual amount and slippage changes, mobile wallet-browser links, Coinbase option, modal focus restoration, hypothetical wallet calculations, transfer-only/full-bypass examples, invalid input, FAQ keyboard operation, activity filtering and skip-link behavior. The offline fixture retains usable public rules and wallet discovery with no invented series, balances, confirmed tier or FDV.
 
-The existing successful buy is `0x595a858a472215ec90b12ef0f30fa193daae4f17fa9ddb83269b6a1214e101ab`. A separate existing native claim was discovered and checked: `0x3b87a1665c4377f5afded9325f14335458b55ee7081a2cdad62dd54907da4470`, block 11906558. Neither was sent by this worker. The full public sell and claim → attest → sync paths remain unproven by this worker; local tests and read-only simulations are not represented as public proofs.
+The live read at block 11912977 covered blocks 11906181–11912975: 27 real events including four Swaps, four router Executed events, one Sale and one native claim. The UI indexes the actual official PoolId and exposes covered interval, two-block delay and read time. History remains sparse, with per-event price/ETH volume and no fabricated OHLC candles. Price display is indicative; verified milestone FDV remained unavailable at the recorded latest verification and is shown as unavailable.
 
-## Rendered and interaction checks
+The fork starts from block 11913004 and forwards browser reads to localhost. It impersonates existing public accounts only in disposable Anvil state; local gas funding and approval reset are explicit test setup. All four Buy percentages estimated actual fork gas, reserved a 20% buffer and filled without signing. Sell percentages used executable quota/balance and seed capacity. The UI then confirmed a buy, a bounded exact 1 UNLK approval to the existing router, a sale settling to nativeCredit, full withdrawal, and an authentic unclaimed round-0 beneficiary's claim/attest/sync. The hashes in fork evidence are local-only, never Sepolia receipts. The live rejecting-provider harness uses public account addresses, rejects every send request and never broadcasts. Recovery tests label injected pending/reverted responses separately from the existing real receipt.
 
-Chromium, Playwright 1.55.1, axe-core Playwright 4.10.2. Browser tooling and downloaded browser dependencies were outside the repository. Reports: `browser-validation.json`, `wallet-validation.json`, `recovery-validation.json`; reproducible scripts are in `web/scripts/`.
+## Better Interface review
 
-- All seven routes rendered at 320, 390, 768 and 1440 CSS pixels: 28 page/width combinations, no horizontal overflow, recorded script error or missing local asset. Local display/body fonts loaded. Screenshots were captured in disposable `test/scratch/browser/` and inspected, including the 390px home, trade, connected allowance/rewards and desktop composition.
-- Axe WCAG 2 A/AA, 2.1 AA and 2.2 AA checks ran on all seven routes **at 390px** with zero reported violations. Empty violation arrays at other widths do not imply an axe audit there; the report explicitly marks the audited widths.
-- Mobile navigation and main Trade entry, wallet dialog opening/Escape, Buy/Sell selection, input/slippage, scenario 35% and final results, transfer-only E=0 scenario, FAQ pointer/keyboard disclosure, holder search, activity filtering and skip-link focus passed. Connection remains available before RPC resolution, including offline.
-- EIP-6963 test provider exposes only an existing public address and rejects every signing/send attempt. Connection requested only accounts and chain. Wrong-network switching, live actual-trader buy quote/fee/gas, 45-second expiry, slippage invalidation, exact router approval review, rejected send/no resend, account-change invalidation and native-claim deduplication passed. No private key was used and no transaction was broadcast.
-- With the first two RPC endpoints intentionally unavailable, the third real public RPC completed runtime/binding/state reads. With the IMD proof API intentionally unavailable, the bundled authentic tree was checked against the live native root. These are real fallback reads, not fabricated chain data.
-- Stored pending receipt state survived reload and exposed manual checking without send/sign calls. Releasing the pending-response fixture confirmed the existing real buy receipt and cleared storage. An explicitly injected reverted response produced the reverted/gas-spent explanation and cleared pending storage. Pending/reverted fixtures test UI behavior only; they are not public transaction evidence.
+Applied the supplied pinned Better Interface workflow while building, then reviewed all six domains against final source and rendered output. The guide, reference, design-critic thresholds, wallet-connector guidance and license were read. `DESIGN.md` records the final implementation using the guide's document-web-design structure. This review is worker evidence, not independent certification.
 
-The pinned entry-page probe was run from the root:
+| Domain | Coverage | Findings and fixes in final source | Remaining limitations |
+| --- | --- | --- | --- |
+| Accessibility | Semantics, visible labels, keyboard, touch, focus, status announcements, reduced motion, contrast, offline states; axe on all six views at 390 | `web/src/charts.tsx:163`: milestone hit regions bounded to prevent overlap, keyboard arrows/Home/End and persistent live readout. `web/src/styles.css:87`: 2px focus outline. `web/src/App.tsx`: route focus and skip link preserved. Primary body trade/wallet actions are 44px | No screen-reader or physical assistive-device test. Dense chart/nav controls meet 24px or spacing baseline; 26 probe targets are below its optional 44px comfort recommendation. Mobile header wallet is 40px |
+| Layout | Desktop/mobile reference comparison; six views at four Chromium widths, three WebKit widths; loading, offline and connected fixtures | `web/src/styles.css:434`: 1280px workspace and 360px form. Mobile overrides around `styles.css:2190` keep the 240px chart and connection action in the first 390px screen. Removed the previous hero and decorative whitespace. `charts.tsx:157`: stagger very narrow category ticks | Native browser 200% zoom and physical device safe-area/browser chrome not tested. At 320px the main form action is below the first screen |
+| Writing | Labels, units, risks, action outcomes, unknown states, technical detail disclosure | `web/src/Terminal.tsx:27`: distinct indicative FDV, confirmed tier and oracle status. `charts.tsx:217`: hypothetical label and threshold warning. `web/src/Unlock.tsx:110`: outside allowance stays in wallet, no escrow. `web/src/Trade.tsx`: router-credit settlement and costs beside actions | English only, as requested. Contract terms and exact addresses remain in expandable diagnostics |
+| Typography | Local font loading, six-size scale, tabular numbers, responsive graph labels, real sparse history axes | `web/src/styles.css:1`: two licensed JetBrains Mono weights. `charts.tsx:15`: actual rendered SVG width avoids scaling 12px labels below readable size. Sparse price labels use enough significant digits to remain distinct | Monospace prose intentionally follows the task; this conflicts with the generic taste heuristic |
+| Colors | Exact requested semantic palette; rendered opaque surfaces plus calculated WCAG luminance pairs; non-color cues | `web/src/styles.css:22`: active input borders strengthened from #52525B (2.438:1 on panel) to #71717A (3.900:1). Text is #F4F4F5/#A1A1AA; green/amber/cyan/pink/red pair with labels, line styles and status text | Automated taste omits SVG text, so explicit token calculations supplement it. Supplemental grid/separators are intentionally low contrast; disabled controls are exempt |
+| UI | Chart/form hierarchy, filters, disclosures, wallet flows, transaction states, gas/percentage behavior, account races and oracle truthfulness | `web/src/Trade.tsx:85`: same-account/same-block readiness and stale/error guards. `Trade.tsx:103`: integer percentage fills and actual gas reserve without signatures. `web/src/data.tsx:129` and `Unlock.tsx:13`: synchronously exclude prior account data. `web/src/math.ts:154`: confirmation progress derives from recorded on-chain observations, not wall-clock prediction | Real extension/passkey signing and phone handoff were not performed. Public oracle advancement depends on valid data and permissionless transactions, not a timer in this site |
+
+No observed high/medium interface defect remains unresolved within this review's coverage. The remaining limitations above are not represented as successful tests.
+
+### Design probe exceptions
+
+Ran the pinned probe against `dist/` from the repository root. PASS: render, layout, targets, contrast, casing, tracking, type-sizes, glyphs, slogans, repetition, copy-budget, chrome, motion, share. Raw failures retained:
+
+1. **type-faces:** reports monospace prose. JetBrains Mono throughout is an explicit requirement, so this is an intentional exception, not changed to satisfy a generic heuristic.
+2. **eyebrows:** misclassifies the required test-asset disclosure above the pair heading, “You receive” above its output value and “Unlock ladder” chart tab above the chart heading. These are a network disclosure, form label and navigation control. None is a decorative tracked-capitals kicker. Retained for clarity and required disclosure.
+
+The raw report is retained as `artifacts/design-probe-raw.json`; bundled `design-probe.json` preserves every check result/output, thresholds, viewport summaries and errors while omitting the large per-node measurements. First-screen prose measured 21 words mobile/28 desktop. The probe found no overflow at 320/390/1440, no overlaps, no missing files, no perpetual motion and no cards inside cards.
+
+## Commands and runtime
+
+Node 22.22.2; existing dependency lockfile installed outside the repository. All source changes were synchronized before the final build. Build/check commands:
 
 ```sh
-IMD_PLAYWRIGHT=/tmp/unlk-browser/node_modules/playwright/index.mjs \
-PLAYWRIGHT_BROWSERS_PATH=/tmp/unlk-browser-binaries \
-node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste
+rsync -a --delete --exclude=node_modules web/ /tmp/unlk-redesign/web/
+npm --prefix /tmp/unlk-redesign/web run typecheck
+npm --prefix /tmp/unlk-redesign/web test
+npm --prefix /tmp/unlk-redesign/web run build
+rsync -a --delete /tmp/unlk-redesign/dist/ dist/
 ```
 
-Result: **16/16 passed**. The 390px first screen visibly contains UNLOCK, its plain product explanation, Trade UNLK and the connect control. The probe measured no overlap, clipped text, obstructing floating control or overflow; all measured text met 4.5:1 (3:1 for large text). It measured six font sizes, two families, natural tracking and 27 words of first-screen prose at 390px. All measured controls met the 24px-or-spacing rule; eight links/branding targets were below the optional 44px comfortable size. Primary controls use at least 44–48px. Title, favicon, description, og:title and a locally rendered og:image were present. The compact probe report is `design-probe.json`.
+Chromium browser module `/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs`, browsers `/opt/imd-tools/ms-playwright`; axe `/tmp/unlk-checks/node_modules/@axe-core/playwright/dist/index.mjs`. These external tools are not submission assets.
 
-## Better Interface review: all six domains
+```sh
+IMD_PLAYWRIGHT=/opt/imd-tools/playwright-mcp/node_modules/playwright/index.mjs \
+PLAYWRIGHT_BROWSERS_PATH=/opt/imd-tools/ms-playwright \
+UNLK_AXE_MODULE=/tmp/unlk-checks/node_modules/@axe-core/playwright/dist/index.mjs \
+  node web/scripts/check-browser.mjs
+# Same IMD_PLAYWRIGHT/BROWSERS settings:
+node web/scripts/check-wallet.mjs
+node web/scripts/check-recovery.mjs
+node /tmp/unlk-redesign/web/scripts/check-fork.mjs
+node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste
+npm --prefix /tmp/unlk-redesign/web run verify:live
+npm --prefix /tmp/unlk-redesign/web run verify:chain
+forge test --match-contract 'TradingTest|SeedBoundaryTest|NativeLaunchTest|ClaimLifecycleInvariants|OracleTest|CreditsAndFeesTest|NativeWithdrawalTest|NativeCustodyInvariantsTest|QuotaInvariantTest' -vv
+forge test --match-contract 'FrontendSwapMathTest|FrontendAllowanceTest' -vv
+```
 
-Applied the pinned guide during construction, including the unattended workflow, all six core-principle sections and document-web-design method. Supporting guidance covered focus/dialogs, forms, responsive tables, numeric data, colors and transaction/error states. The source-specific review is consolidated here rather than split among agents.
+The cross-language test sources are generated into disposable `test/scratch/` by the delivered `web/scripts/check-swap-math.ts` and `check-allowance-math.ts`; generation requires installed frontend dependencies. Existing compilation output was copied to the isolated parent for `verify:chain` so it could compare the unchanged Foundry ABI/runtime artifacts.
 
-| Domain | Coverage and final source references | Findings and correction |
-| --- | --- | --- |
-| Accessibility | Native buttons/links/dialog/details, labels, landmarks, skip link and route focus (`web/src/App.tsx:72`, `web/src/wallet.tsx:90`); visible focus (`web/src/styles.css:92`), named progress, mobile table labels, reduced motion (`web/src/styles.css:1634`) | Route/skip focus originally risked moving to the wrong hash or away from the first screen. Focus now preserves route and uses `preventScroll`; keyboard tests pass. Added a textual space across the display line break (`web/src/pages.tsx:50`) for a correct accessible heading name. Mobile table headers now remain in the accessibility tree, with explicit column scopes, instead of being removed by `display: none` (`web/src/styles.css:2026`, `web/src/pages.tsx:940`). Dialog Escape and focus behavior were inspected. Physical screen-reader use and native zoom remain unperformed. |
-| Layout | Editorial home, early main action, trade form first on phones, content-based breakpoints at 1250/1090/760/440 (`web/src/styles.css:1649`), wrapped exact identifiers, labeled table rows | Testnet notice needed to remain visible while scrolling. It is sticky, and scroll padding reserves its space (`web/src/styles.css:48`, `:311`). Layout/probe checks found no overlaps or overflow at tested sizes. The 390px screenshot confirms product/action on the first screen. |
-| Writing | English labels beside W/E/S/p, sell allowance versus balance, testnet disclosure, exact spender/amount/deadline, earned/indicative/pending separation, disclosure of bypass/manipulation/governance (`web/src/pages.tsx:255`, `:630`, `:1080`) | Wording avoids calling wallet tokens escrowed/locked and separates router credit from delivered wallet ETH. Existing native claim discovery was reconciled into progress; the unproven sell/full reward flow stays explicitly pending. No guaranteed price, return or date. |
-| Typography | Local DM Sans and Instrument Serif, six sizes, 400/500/600 weights, tabular numbers, bounded prose width (`web/src/styles.css:1`, `:38`, `:188`) | No extra decorative type sizes, tracked uppercase kickers or fabricated chart labels. Chart positions use event timestamps; invalid prices are excluded rather than replaced by zero (`web/src/charts.tsx:6`). Probe measured six sizes/two families at both entry widths. Exact consequential values appear in reviews; shortened presentation values retain the full value in the `Amount` title. |
-| Colors | Ink/paper/cyan/champagne roles, scoped light form theme, text plus color state cues, forced-colors support (`web/src/styles.css:23`, `:776`, `:2227`) | Initial paper-form token inheritance produced insufficient contrast. The form now scopes dark foreground values explicitly. Rendered axe checks on all seven mobile routes and the probe’s solid-background contrast check pass. Dynamic wallet-extension UI is outside the page’s styling/coverage. |
-| UI | Explicit connect/review/sign stages, simulation and gas before each write, loading/error states, account invalidation, optional storage, proof verification/deduplication, receipt recovery (`web/src/wallet.tsx:278`, `web/src/Trade.tsx:86`, `web/src/Rewards.tsx:209`) | Prevented same-wallet refresh flicker and disabled stale reads; optional storage failures cannot break connection. Cancelled/replaced transactions do not falsely complete the original action. Fixed a one-wei/large-input fee attribution discrepancy uncovered by Solidity differential testing (`web/src/math.ts:139`). All applicable primary interaction findings were repaired and rerun. |
+The browser connector could not launch because its managed cache was read-only (EROFS); direct Playwright successfully rendered the export instead. WebKit used the available 1.56.1 runner/browser and temporary system-library extraction outside the repository. Direct WebKit HTTPS requests failed in this runtime, so `check-webkit.mjs` forwards them through Node to the real public read endpoints. No response values are fabricated. This verifies WebKit rendering/interaction, not native Safari's external-network behavior. Public RPC/proof-service availability remains external.
 
-`DESIGN.md` documents the implemented tokens, type, spacing, shapes, components, responsive rules and motion. Attribution/license text is retained in `web/NOTICE.md` and `web/licenses/design-guidance.txt`.
+## Publication and scope
 
-Two test-harness timing issues were repaired: holder filtering now waits for the loaded holder table, and the expiry assertion waits for the actual review control to disappear rather than matching the always-visible secondary refresh button. These were test races, not silently discarded assertions. Final browser/wallet reports contain no errors. Reproduction scripts create their output directories, so a fresh checkout does not depend on worker-only artifacts.
+The static export and source are prepared for the contributor network to publish under the existing `unlk.site.identitymd.eth` name at https://unlk.sites.imd.fun/. The task prohibits writing `.git/`; no new commit or IPFS CID is claimed from this worker. `artifacts/publication.json` records the accepted base and pending publisher-assigned values. The previous CID is not reused as a redesign result.
 
-## Limits and unperformed checks
-
-WebKit did not complete. Its standard launch reported missing system libraries. An additional attempt with libraries installed outside the repository reached an EGL-display failure (`Could not create WPE EGL display: EGL_SUCCESS`); Safari/iPhone rendering is not claimed. Chromium mobile sizes are viewport checks, not physical phones. Physical MetaMask/Rabby extensions, Coinbase passkey signing, mobile deep-link handoff, a screen reader, native browser zoom, and transaction replacement UI were not exercised end to end. Smart-wallet routing/custody is covered by existing local contract tests and an EIP-1193 direct-address implementation, not by a live passkey transaction.
-
-No public approval, sell, withdrawal, checkpoint, milestone update, new claim, attestation, synchronization or certification was signed. Public round 0 was already certified; later-round import/chunk certification is implemented against actual methods but not executed publicly. Unavailable/live external services can still change or fail. The complete small current event history was indexed from block 11906181; future large histories may take longer or be partial, and the UI labels coverage. Current holder count means nonzero discovered addresses excluding zero; it includes infrastructure and is not a count of people. Pagination is implemented, but current live data does not fill multiple holder pages.
-
-A static export does not operate an oracle keeper. Invalid oracle data blocks new milestones, not previously earned rights. External governance, sustained-price manipulation, alternate pools and treasury reward-round powers remain project risks, documented and linked rather than asserted away.
+The frontend does not complete or change protocol activation, oracle economics or any outstanding public transaction tests. Earlier contract documentation is retained separately in README for provenance. Current live bindings are active, but valid milestone FDV remains unavailable; the redesign does not make an economic or milestone promise.
